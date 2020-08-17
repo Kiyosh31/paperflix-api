@@ -27,4 +27,9 @@ urlpatterns = [
     path('category-update/<int:id_category>/', category_update, name='category-update'),
     path('category-delete/<int:id_category>/', category_delete, name='category-delete'),
     path('category-activate/<int:id_category>/', category_activate, name='category-activate'),
+
+    path('categorypaper-create/', categorypaper_create, name='categorypaper-activate'),
+    path('categorypaper-list/', categorypaper_list, name='categorypaper-list'),
+    path('categorypaper-detail/<int:id_categorypaper>/', categorypaper_detail, name='categorypaper-detail'),
+    path('categorypaper-update/<int:id_categorypaper>/', categorypaper_update, name='categorypaper-update'),
 ]

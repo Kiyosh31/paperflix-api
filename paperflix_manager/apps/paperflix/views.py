@@ -10,11 +10,31 @@ from .models import *
 @api_view(['GET'])
 def api_overview(request):
     api_urls = {
-        'List-Users': 'users/list',
-        'Detail-Users': 'users/detail',
-        'Create-Users': 'users/create',
-        'Update-Users': 'users/update/<int:id_user>',
-        'Delete-Users': 'users/delete<int:id_user>',
+        'Users-List': 'user-list/',
+        'Users-Detail': 'user-detail/',
+        'Users-Create': 'user-Create/',
+        'Users-Update': 'user-update/<int:id_user>/',
+        'Users-Delete': 'user-delete/<int:id_user>/',
+        'PapersUsers-List': 'papersuser-list/',
+        'PapersUsers-Detail': 'papersuser-detail/',
+        'PapersUsers-Create': 'papersuser-create/',
+        'PapersUsers-Update': 'papersuser-update/<int:id_paperuser>/',
+        'PapersUsers-Delete': 'papersuser-delete/<int:id_paperuser>/',
+        'Papers-List': 'paper-list/',
+        'Papers-Detail': 'paper-detail/',
+        'Papers-Create': 'paper-create/',
+        'Papers-Update': 'paper-update/<int:id_paper>/',
+        'Papers-Delete': 'paper-delete/<int:id_paper>/',
+        'Categories-List': 'category-list/',
+        'Categories-Detail': 'category-detail/',
+        'Categories-Create': 'category-create/',
+        'Categories-Update': 'category-update/<int:id_category>/',
+        'Categories-Delete': 'category-delete/<int:id_category>/',
+        'CategoryPapers-List': 'categorypaper-list/',
+        'CategoryPapers-Detail': 'categorypaper-detail/',
+        'CategoryPapers-Create': 'categorypaper-create/',
+        'CategoryPapers-Update': 'categorypaper-update/<int:id_categorypaper>/',
+        'CategoryPapers-Delete': 'categorypaper-delete/<int:id_categorypaper>/',
     }
 
     return Response(api_urls)
@@ -27,7 +47,7 @@ def api_overview(request):
 @api_view(['GET'])
 def user_list(request):
     try:
-        users = Users.objects.all()
+        users = Users.objects.filter(status=True)
         serializer = UsersSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
@@ -266,6 +286,56 @@ def category_activate(request, id_category=None):
         serializer.save()
         serializer_dict = serializer.data
         serializer_dict['message'] = 'Categoria activada correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ============================================================================== #
+# ============================================================================== #
+# ============================================================================== #
+# ENDPOINTS CATEGORIE_PAPERS
+
+@api_view(['POST'])
+def categorypaper_create(request):
+    serializer = CategoryPapersSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Pivote creado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def categorypaper_list(request):
+    try:
+        categorypaper = CategoryPaper.objects.all()
+        serializer = CategoryPapersSerializer(categorypaper, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Pivote no encontrado', status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def categorypaper_detail(request, id_categorypaper=None):
+    try:
+        categorypaper = CategoryPaper.objects.get(id_categorypaper=id_categorypaper)
+        serializer = CategoriesSerializer(categorypaper, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Pivote no encontrado', status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PATCH'])
+def categorypaper_update(request, id_categorypaper=None):
+    categorypaper = CategoryPaper.objects.get(id_categorypaper=id_categorypaper)
+    serializer = CategoryPapersSerializer(instance=categorypaper, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Pivote modificado correctamente'
         return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

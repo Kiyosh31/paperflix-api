@@ -24,3 +24,9 @@ class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categories
         fields = '__all__'
+
+
+class CategoryPapersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryPaper
+        fields = '__all__'

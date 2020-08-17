@@ -55,5 +55,6 @@ class Categories(models.Model):
 
 
 class CategoryPaper(models.Model):
+    id_categorypaper = models.AutoField(primary_key=True)
     id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
     id_category = models.ForeignKey(Categories, on_delete=models.CASCADE)
