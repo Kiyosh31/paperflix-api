@@ -19,12 +19,15 @@ def api_overview(request):
 
     return Response(api_urls)
 
-
+# ============================================================================== #
+# ============================================================================== #
+# ============================================================================== #
 # ENDPOINTS USERS
+
 @api_view(['GET'])
 def user_list(request):
     try:
-        users = Users.objects.filter(status=True)
+        users = Users.objects.all()
         serializer = UsersSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
@@ -91,8 +94,11 @@ def user_activate(request, id_user=None):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+# ============================================================================== #
+# ============================================================================== #
+# ============================================================================== #
 # ENDPOINTS PAPERS_USER
+
 @api_view(['POST'])
 def papersuser_create(request):
     serializer = PapersUserSerializer(data=request.data)
@@ -112,7 +118,7 @@ def papersuser_list(request):
         serializer = PapersUserSerializer(history, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -122,7 +128,7 @@ def papersuser_detail(request, id_user=None):
         serializer = PapersUserSerializer(history, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
-        return Response('Objeto no encontrado', status=status.HTTP_404_NOT_FOUND)
+        return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['PATCH'])
@@ -133,6 +139,133 @@ def papersuser_update(request, id_user=None):
         serializer.save()
         serializer_dict = serializer.data
         serializer_dict['message'] = 'Historial modificado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ============================================================================== #
+# ============================================================================== #
+# ============================================================================== #
+# ENDPOINTS PAPERS
+
+@api_view(['POST'])
+def paper_create(request):
+    serializer = PapersSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Paper creado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def paper_list(request):
+    try:
+        paper = Papers.objects.all()
+        serializer = PapersSerializer(paper, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def paper_detail(request, id_paper=None):
+    try:
+        paper = Papers.objects.get(id_paper=id_paper)
+        serializer = PapersSerializer(paper, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PATCH'])
+def paper_update(request, id_paper=None):
+    paper = Papers.objects.get(id_paper=id_paper)
+    serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Paper modificado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# ============================================================================== #
+# ============================================================================== #
+# ============================================================================== #
+# ENDPOINTS CATEGORIES
+
+@api_view(['POST'])
+def category_create(request):
+    serializer = CategoriesSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Categoria creado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def category_list(request):
+    try:
+        category = Categories.objects.filter(status=True)
+        serializer = CategoriesSerializer(category, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def category_detail(request, id_category=None):
+    try:
+        category = Categories.objects.get(id_category=id_category)
+        serializer = CategoriesSerializer(category, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PATCH'])
+def category_update(request, id_category=None):
+    category = Categories.objects.get(id_category=id_category)
+    serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Categoria modificada correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+def category_delete(request, id_category=None):
+    category = Categories.objects.get(id_category=id_category)
+    request.data['status'] = False
+    serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Categoria eliminada correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+def category_activate(request, id_category=None):
+    category = Categories.objects.get(id_category=id_category)
+    request.data['status'] = True
+    serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Categoria activada correctamente'
         return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

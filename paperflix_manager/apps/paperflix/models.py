@@ -20,6 +20,7 @@ class Users(models.Model):
 
 class Papers(models.Model):
     id_paper = models.AutoField(primary_key=True)
+    title = models.CharField('Titulo', max_length=255, blank=False, null=False)
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
     publication_year = models.DateField('Fecha de publicacion', blank=False, null=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
