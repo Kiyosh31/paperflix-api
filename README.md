@@ -1,5 +1,5 @@
-# paperflix-api
-backend proyecto modular
+# Paperflix-api
+Backend proyecto modular INCO 2020
 
 # Requirements
 Python 3.8.3
@@ -33,6 +33,6 @@ $ pip install -r requirements.txt
 ```
  
  # Collaborators
- David Garcia 
- Ivan Romero
- Mari Villalobos
+ * David Garcia 
+ * Ivan Romero
+ * Mari Villalobos
