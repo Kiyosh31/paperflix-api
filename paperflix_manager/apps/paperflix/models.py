@@ -18,18 +18,9 @@ class Users(models.Model):
         return self.name
 
 
-class PapersUser(models.Model):
-    id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    id_paper = models.IntegerField()
-    rated = models.IntegerField()
-
-    class Meta:
-        verbose_name = 'Paper'
-        verbose_name_plural = 'Papers'
-
-
 class Papers(models.Model):
     id_paper = models.AutoField(primary_key=True)
+    title = models.CharField('Titulo', max_length=255, blank=False, null=False)
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
     publication_year = models.DateField('Fecha de publicacion', blank=False, null=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
@@ -46,6 +37,17 @@ class Papers(models.Model):
         return self.author
 
 
+class PapersUser(models.Model):
+    id_papersuser = models.AutoField(primary_key=True)
+    id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
+    rated = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'Paper'
+        verbose_name_plural = 'Papers'
+
+
 class Categories(models.Model):
     id_category = models.AutoField(primary_key=True)
     category = models.CharField('Categoria', max_length=255, blank=False, null=False)
@@ -53,5 +55,6 @@ class Categories(models.Model):
 
 
 class CategoryPaper(models.Model):
+    id_categorypaper = models.AutoField(primary_key=True)
     id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
     id_category = models.ForeignKey(Categories, on_delete=models.CASCADE)

@@ -5,12 +5,28 @@ from .models import *
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        # fields = ('id_user', 'name', 'mail', 'password', 'status')
+        fields = '__all__'
+
+
+class PapersUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PapersUser
         fields = '__all__'
 
 
 class PapersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PapersUser
-        # fields = ('id_user', 'id_paper', 'rated')
+        model = Papers
+        fields = '__all__'
+
+
+class CategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categories
+        fields = '__all__'
+
+
+class CategoryPapersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryPaper
         fields = '__all__'
