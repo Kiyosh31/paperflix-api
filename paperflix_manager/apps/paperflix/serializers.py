@@ -7,3 +7,8 @@ class UsersSerializer(serializers.ModelSerializer):
         model = Users
         fields = '__all__'
 
+
+class PapersUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PapersUser
+        fields = '__all__'

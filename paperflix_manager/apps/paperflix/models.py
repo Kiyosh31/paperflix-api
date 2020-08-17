@@ -18,16 +18,6 @@ class Users(models.Model):
         return self.name
 
 
-class PapersUser(models.Model):
-    id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    id_paper = models.IntegerField()
-    rated = models.IntegerField()
-
-    class Meta:
-        verbose_name = 'Paper'
-        verbose_name_plural = 'Papers'
-
-
 class Papers(models.Model):
     id_paper = models.AutoField(primary_key=True)
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
@@ -44,6 +34,17 @@ class Papers(models.Model):
 
     def __str__(self):
         return self.author
+
+
+class PapersUser(models.Model):
+    id_papersuser = models.AutoField(primary_key=True)
+    id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
+    rated = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'Paper'
+        verbose_name_plural = 'Papers'
 
 
 class Categories(models.Model):
