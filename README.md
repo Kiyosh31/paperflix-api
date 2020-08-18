@@ -27,8 +27,7 @@ $ pip install -r requirements.txt
  
 # Run the project
 ```
- $ python manage.py makemigrations
- $ python manage.py migrate
+ $ cd paperflix_manager
  $ python manage.py runserver
 ```
  
