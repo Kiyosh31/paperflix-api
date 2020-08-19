@@ -35,4 +35,3 @@ $ pip install -r requirements.txt
  * David Garcia 
  * Ivan Romero
  * Mari Villalobos
- 
