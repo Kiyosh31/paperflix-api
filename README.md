@@ -30,8 +30,6 @@ $ pip install -r requirements.txt
  $ cd paperflix_manager
  $ python manage.py runserver
 ```
-
-# HOla
  
  # Collaborators
  * David Garcia 
