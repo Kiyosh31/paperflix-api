@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.paperflix',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
 

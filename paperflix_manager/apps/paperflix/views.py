@@ -3,6 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import authentication_classes, permission_classes
+
 from .serializers import *
 from .models import *
 
@@ -45,6 +49,8 @@ def api_overview(request):
 # ENDPOINTS USERS
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def user_list(request):
     try:
         users = Users.objects.filter(status=True)
@@ -55,6 +61,8 @@ def user_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def user_detail(request, id_user=None):
     user = Users.objects.get(id_user=id_user)
     serializer = UsersSerializer(user, many=False)
@@ -63,6 +71,8 @@ def user_detail(request, id_user=None):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def user_create(request):
     serializer = UsersSerializer(data=request.data)
     if serializer.is_valid():
@@ -75,6 +85,8 @@ def user_create(request):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def user_update(request, id_user):
     user = Users.objects.get(id_user=id_user)
     serializer = UsersSerializer(instance=user, data=request.data, partial=True)
@@ -88,6 +100,8 @@ def user_update(request, id_user):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def user_delete(request, id_user):
     user = Users.objects.get(id_user=id_user)
     request.data['status'] = False
@@ -102,6 +116,8 @@ def user_delete(request, id_user):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def user_activate(request, id_user=None):
     user = Users.objects.get(id_user=id_user)
     request.data['status'] = True
