@@ -19,26 +19,25 @@ def api_overview(request):
         'Users-Create': 'user-Create/',
         'Users-Update': 'user-update/<int:id_user>/',
         'Users-Delete': 'user-delete/<int:id_user>/',
+        'Users-Activate': 'user-activate/<int:id_user>/',
         'PapersUsers-List': 'papersuser-list/',
         'PapersUsers-Detail': 'papersuser-detail/',
         'PapersUsers-Create': 'papersuser-create/',
         'PapersUsers-Update': 'papersuser-update/<int:id_user>/',
-        'PapersUsers-Delete': 'papersuser-delete/<int:id_user>/',
         'Papers-List': 'paper-list/',
         'Papers-Detail': 'paper-detail/',
         'Papers-Create': 'paper-create/',
         'Papers-Update': 'paper-update/<int:id_paper>/',
-        'Papers-Delete': 'paper-delete/<int:id_paper>/',
         'Categories-List': 'category-list/',
         'Categories-Detail': 'category-detail/',
         'Categories-Create': 'category-create/',
         'Categories-Update': 'category-update/<int:id_category>/',
         'Categories-Delete': 'category-delete/<int:id_category>/',
+        'Categories-Activate': 'category-activate/<int:id_category>/',
         'CategoryPapers-List': 'categorypaper-list/',
         'CategoryPapers-Detail': 'categorypaper-detail/',
         'CategoryPapers-Create': 'categorypaper-create/',
         'CategoryPapers-Update': 'categorypaper-update/<int:id_categorypaper>/',
-        'CategoryPapers-Delete': 'categorypaper-delete/<int:id_categorypaper>/',
     }
 
     return Response(api_urls)
@@ -57,17 +56,19 @@ def user_list(request):
         serializer = UsersSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response('Usuarios no encontrados', status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def user_detail(request, id_user=None):
-    user = Users.objects.get(id_user=id_user)
-    serializer = UsersSerializer(user, many=False)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    try:
+        user = Users.objects.get(id_user=id_user)
+        serializer = UsersSerializer(user, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Usuario no encontrado', status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
@@ -87,7 +88,7 @@ def user_create(request):
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
-def user_update(request, id_user):
+def user_update(request, id_user=None):
     user = Users.objects.get(id_user=id_user)
     serializer = UsersSerializer(instance=user, data=request.data, partial=True)
     if serializer.is_valid():
@@ -102,7 +103,7 @@ def user_update(request, id_user):
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
-def user_delete(request, id_user):
+def user_delete(request, id_user=None):
     user = Users.objects.get(id_user=id_user)
     request.data['status'] = False
     serializer = UsersSerializer(instance=user, data=request.data, partial=True)
@@ -136,6 +137,8 @@ def user_activate(request, id_user=None):
 # ENDPOINTS PAPERS_USER
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def papersuser_create(request):
     serializer = PapersUserSerializer(data=request.data)
     if serializer.is_valid():
@@ -148,6 +151,8 @@ def papersuser_create(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def papersuser_list(request):
     try:
         history = PapersUser.objects.all()
@@ -158,6 +163,8 @@ def papersuser_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def papersuser_detail(request, id_user=None):
     try:
         history = PapersUser.objects.get(id_user=id_user)
@@ -168,6 +175,8 @@ def papersuser_detail(request, id_user=None):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def papersuser_update(request, id_user=None):
     history = PapersUser.objects.get(id_user=id_user)
     serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
@@ -186,6 +195,8 @@ def papersuser_update(request, id_user=None):
 # ENDPOINTS PAPERS
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def paper_create(request):
     serializer = PapersSerializer(data=request.data)
     if serializer.is_valid():
@@ -198,6 +209,8 @@ def paper_create(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def paper_list(request):
     try:
         paper = Papers.objects.all()
@@ -208,6 +221,8 @@ def paper_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def paper_detail(request, id_paper=None):
     try:
         paper = Papers.objects.get(id_paper=id_paper)
@@ -218,6 +233,8 @@ def paper_detail(request, id_paper=None):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def paper_update(request, id_paper=None):
     paper = Papers.objects.get(id_paper=id_paper)
     serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
@@ -235,6 +252,8 @@ def paper_update(request, id_paper=None):
 # ENDPOINTS CATEGORIES
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def category_create(request):
     serializer = CategoriesSerializer(data=request.data)
     if serializer.is_valid():
@@ -247,6 +266,8 @@ def category_create(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def category_list(request):
     try:
         category = Categories.objects.filter(status=True)
@@ -257,6 +278,8 @@ def category_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def category_detail(request, id_category=None):
     try:
         category = Categories.objects.get(id_category=id_category)
@@ -267,6 +290,8 @@ def category_detail(request, id_category=None):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def category_update(request, id_category=None):
     category = Categories.objects.get(id_category=id_category)
     serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
@@ -280,6 +305,8 @@ def category_update(request, id_category=None):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def category_delete(request, id_category=None):
     category = Categories.objects.get(id_category=id_category)
     request.data['status'] = False
@@ -294,6 +321,8 @@ def category_delete(request, id_category=None):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def category_activate(request, id_category=None):
     category = Categories.objects.get(id_category=id_category)
     request.data['status'] = True
@@ -313,6 +342,8 @@ def category_activate(request, id_category=None):
 # ENDPOINTS CATEGORIE_PAPERS
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def categorypaper_create(request):
     serializer = CategoryPapersSerializer(data=request.data)
     if serializer.is_valid():
@@ -325,6 +356,8 @@ def categorypaper_create(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def categorypaper_list(request):
     try:
         categorypaper = CategoryPaper.objects.all()
@@ -335,6 +368,8 @@ def categorypaper_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def categorypaper_detail(request, id_categorypaper=None):
     try:
         categorypaper = CategoryPaper.objects.get(id_categorypaper=id_categorypaper)
@@ -345,6 +380,8 @@ def categorypaper_detail(request, id_categorypaper=None):
 
 
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication, BasicAuthentication])
 def categorypaper_update(request, id_categorypaper=None):
     categorypaper = CategoryPaper.objects.get(id_categorypaper=id_categorypaper)
     serializer = CategoryPapersSerializer(instance=categorypaper, data=request.data, partial=True)
