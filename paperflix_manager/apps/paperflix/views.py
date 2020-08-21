@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 
 from .serializers import *
 from .models import *
@@ -12,7 +12,8 @@ from .models import *
 def api_overview(request):
     api_urls = {
         'Users-List': 'user-list/',
-        'Users-Detail': 'user-detail/',
+        'Users-Detail': 'user-detail/<int:id_user>/',
+        'Users-Login': 'user-login/',
         'Users-Create': 'user-Create/',
         'Users-Update': 'user-update/<int:id_user>/',
         'Users-Delete': 'user-delete/<int:id_user>/',
@@ -22,7 +23,7 @@ def api_overview(request):
         'PapersUsers-Update': 'papersuser-update/<int:id_user>/',
         'PapersUsers-Delete': 'papersuser-delete/<int:id_user>/',
         'Papers-List': 'paper-list/',
-        'Papers-Detail': 'paper-detail/',
+        'Papers-Detail': 'paper-detail/<int:id_paper>/',
         'Papers-Create': 'paper-create/',
         'Papers-Update': 'paper-update/<int:id_paper>/',
         'Papers-Delete': 'paper-delete/<int:id_paper>/',
@@ -61,6 +62,19 @@ def user_detail(request, id_user=None):
         user = Users.objects.get(id_user=id_user)
         serializer = UsersSerializer(user, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def user_login(request):
+    try:
+        user = Users.objects.filter(email=request.data['email'])[0]
+        if check_password(request.data['password'], user.password):
+            serializer = UsersSerializer(user, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 

@@ -5,7 +5,7 @@ from django.db import models
 class Users(models.Model):
     id_user = models.AutoField(primary_key=True)
     name = models.CharField('Nombre', max_length=255)
-    mail = models.EmailField('email', null=False, blank=False)
+    email = models.EmailField('email', null=False, blank=False, unique=True)
     password = models.CharField('Contraseña', max_length=255)
     status = models.BooleanField('Activo/Inactivo', default=True)
     created_at = models.DateField('Fecha de creacion', auto_now=False, auto_now_add=True)
