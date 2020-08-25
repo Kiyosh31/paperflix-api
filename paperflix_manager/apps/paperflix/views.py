@@ -51,10 +51,10 @@ def api_overview(request):
 
 @api_view(['GET'])
 def showb64file(request):
-
     files_db = FilesDB()
     b64file = files_db.base64File(1)
-    return render(request, 'b64.html', {'b64file':b64file})
+    return Response(b64file, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def user_list(request):

@@ -3,7 +3,7 @@ from .views import *
 
 
 urlpatterns = [
-    path('showb64file', showb64file, name='showb64file'),
+    path('paper/', showb64file, name='paper'),
     
     path('user-list/', user_list, name='user-list'),
     path('user-detail/<int:id_user>/', user_detail, name='user-detail'),

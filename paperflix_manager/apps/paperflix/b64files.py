@@ -31,6 +31,7 @@ class FilesDB:
 		data = self.encode(file_).decode()
 		
 		return data
+
 	
 	def bz2Compress(self, file_name):
 		
