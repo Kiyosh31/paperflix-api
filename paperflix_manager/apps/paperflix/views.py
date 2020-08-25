@@ -3,9 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password, check_password
+from django.shortcuts import render
 
 from .serializers import *
 from .models import *
+
+from .b64files import FilesDB
 
 
 @api_view(['GET'])
@@ -45,6 +48,13 @@ def api_overview(request):
 # ============================================================================== #
 # ============================================================================== #
 # ENDPOINTS USERS
+
+@api_view(['GET'])
+def showb64file(request):
+
+    files_db = FilesDB()
+    b64file = files_db.base64File(1)
+    return render(request, 'b64.html', {'b64file':b64file})
 
 @api_view(['GET'])
 def user_list(request):

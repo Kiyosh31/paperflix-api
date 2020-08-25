@@ -3,7 +3,8 @@ from .views import *
 
 
 urlpatterns = [
-    path('', api_overview, name='api-overview'),
+    path('showb64file', showb64file, name='showb64file'),
+    
     path('user-list/', user_list, name='user-list'),
     path('user-detail/<int:id_user>/', user_detail, name='user-detail'),
     path('user-login/', user_login, name='user-login'),
