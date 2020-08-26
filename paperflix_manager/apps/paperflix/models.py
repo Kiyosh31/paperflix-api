@@ -22,14 +22,14 @@ class Papers(models.Model):
     id_paper = models.AutoField(primary_key=True)
     title = models.CharField('Titulo', max_length=255, blank=False, null=False)
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
-    publication_year = models.DateField('Fecha de publicacion', blank=False, null=False)
+    publication_year = models.IntegerField('Fecha de publicacion', blank=False, null=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
     language = models.CharField("Idioma", max_length=255, blank=False, null=False)
-    number_pages = models.IntegerField()
-    viewed = models.IntegerField()
-    downloads = models.IntegerField()
-    pos_rate = models.IntegerField()
-    neg_rate = models.IntegerField()
+    number_pages = models.IntegerField(null=True)
+    viewed = models.IntegerField(null=True)
+    downloads = models.IntegerField(null=True)
+    pos_rate = models.IntegerField(null=True)
+    neg_rate = models.IntegerField(null=True)
 
     class Meta:
         verbose_name = 'Papers'

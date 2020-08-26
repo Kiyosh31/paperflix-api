@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('paper/', showb64file, name='paper'),
-    
+
     path('user-list/', user_list, name='user-list'),
     path('user-detail/<int:id_user>/', user_detail, name='user-detail'),
     path('user-login/', user_login, name='user-login'),

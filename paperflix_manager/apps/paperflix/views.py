@@ -3,12 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password, check_password
-from django.shortcuts import render
 
 from .serializers import *
 from .models import *
 
-from .b64files import FilesDB
+from .files import files_db
 
 
 @api_view(['GET'])
@@ -44,16 +43,16 @@ def api_overview(request):
 
     return Response(api_urls)
 
+
+@api_view(['GET'])
+def showb64file(request):
+    b64file = files_db.getFileb64(1)
+    return Response(b64file, status=status.HTTP_200_OK)
+
 # ============================================================================== #
 # ============================================================================== #
 # ============================================================================== #
 # ENDPOINTS USERS
-
-@api_view(['GET'])
-def showb64file(request):
-    files_db = FilesDB()
-    b64file = files_db.base64File(1)
-    return Response(b64file, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -199,11 +198,15 @@ def papersuser_update(request, id_user=None):
 
 @api_view(['POST'])
 def paper_create(request):
+    print(request.data[0])
+    data = request.data.pop('file')
+    print(request.data)
     serializer = PapersSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         serializer_dict = serializer.data
         serializer_dict['message'] = 'Paper creado correctamente'
+        # files_db.setFile(serializer_dict['id_paper'], data)
         return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
