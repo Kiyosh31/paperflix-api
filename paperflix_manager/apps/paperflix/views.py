@@ -198,15 +198,14 @@ def papersuser_update(request, id_user=None):
 
 @api_view(['POST'])
 def paper_create(request):
-    print(request.data[0])
-    data = request.data.pop('file')
+    data = request.data.pop('selectedFile')
     print(request.data)
     serializer = PapersSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         serializer_dict = serializer.data
         serializer_dict['message'] = 'Paper creado correctamente'
-        # files_db.setFile(serializer_dict['id_paper'], data)
+        files_db.setFile(serializer_dict['id_paper'], data)
         return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
