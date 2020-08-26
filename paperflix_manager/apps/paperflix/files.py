@@ -16,12 +16,14 @@ class FilesDB:
 	def __init__(self):
 		
 		self.db = 'files.sqlite3'
-		self.con = sqlite3.connect(self.db, check_same_thread=False)
-		self.cur = self.con.cursor()
 	
 	# Creates: =========================================================
 	
 	def createDatabase(self, table_name):
+		
+		self.con = sqlite3.connect(self.db)
+		self.cur = self.con.cursor()
+
 		print(True)
 		SQL1 = '''
 		CREATE TABLE IF NOT EXISTS {}
@@ -35,10 +37,16 @@ class FilesDB:
 		
 		self.cur.execute(SQL1)
 		self.con.commit()
+
+		self.cur.close()
+		self.con.close()
 	
 	# Utilidades: ======================================================
 	
 	def setFile(self, id_paper, file_):
+		
+		self.con = sqlite3.connect(self.db)
+		self.cur = self.con.cursor()
 		
 		file_ = file_.replace('data:application/pdf;base64,','')
 		file_ = self.decode(file_.encode())
@@ -53,12 +61,21 @@ class FilesDB:
 		self.cur.execute(SQL, data)
 		self.con.commit()
 
+		self.cur.close()
+		self.con.close()
+
 	def getFile(self, id_paper):
+		
+		self.con = sqlite3.connect(self.db)
+		self.cur = self.con.cursor()
 		
 		SQL = 'SELECT file FROM Files WHERE id_paper={};'.format(id_paper)
 		self.cur.execute(SQL)
 		file_ = self.cur.fetchone()[0]
 		file_ = bz2.decompress(file_)
+		
+		self.cur.close()
+		self.con.close()
 		
 		return file_
 	
