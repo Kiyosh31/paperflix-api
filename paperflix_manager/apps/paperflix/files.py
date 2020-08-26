@@ -16,7 +16,7 @@ class FilesDB:
 	def __init__(self):
 		
 		self.db = 'files.sqlite3'
-		self.con = sqlite3.connect(self.db)
+		self.con = sqlite3.connect(self.db, check_same_thread=False)
 		self.cur = self.con.cursor()
 	
 	# Creates: =========================================================
@@ -41,7 +41,7 @@ class FilesDB:
 	def setFile(self, id_paper, file_):
 		
 		file_ = file_.replace('data:application/pdf;base64,','')
-		file_ = self.encode(file_)
+		file_ = self.decode(file_.encode())
 		file_ = bz2.compress(file_)
 		SQL = 'INSERT INTO Files VALUES (null, ?, ?, ?)'
 		data = [
