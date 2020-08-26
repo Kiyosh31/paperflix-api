@@ -40,6 +40,8 @@ class FilesDB:
 	
 	def setFile(self, id_paper, file_):
 		
+		file_ = file_.replace('data:application/pdf;base64,','')
+		file_ = self.encode(file_)
 		file_ = bz2.compress(file_)
 		SQL = 'INSERT INTO Files VALUES (null, ?, ?, ?)'
 		data = [
