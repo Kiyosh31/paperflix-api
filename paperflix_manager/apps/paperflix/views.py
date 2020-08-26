@@ -44,9 +44,10 @@ def api_overview(request):
     return Response(api_urls)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def showb64file(request):
-    b64file = files_db.getFileb64(1)
+    print(request.data)
+    b64file = files_db.getFileb64(request.data.get('id_paper'))
     return Response(b64file, status=status.HTTP_200_OK)
 
 # ============================================================================== #
@@ -199,7 +200,6 @@ def papersuser_update(request, id_user=None):
 @api_view(['POST'])
 def paper_create(request):
     data = request.data.pop('selectedFile')
-    print(request.data)
     serializer = PapersSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
