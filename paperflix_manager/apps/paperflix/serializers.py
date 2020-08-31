@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import *
 
 
+class AdminUsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminUsers
+        fields = '__all__'
+
+
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users

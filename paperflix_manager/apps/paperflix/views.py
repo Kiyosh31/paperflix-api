@@ -52,6 +52,37 @@ def showb64file(request):
 # ============================================================================== #
 # ============================================================================== #
 # ============================================================================== #
+# ENDPOINTS ADMIN USERS
+
+
+@api_view(['POST'])
+def admin_user_create(request):
+    request.data['password'] = make_password(request.data['password'])
+    serializer = AdminUsersSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Usuario creado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def admin_user_login(request):
+    try:
+        user = AdminUsers.objects.filter(email=request.data['email'])[0]
+        if check_password(request.data['password'], user.password):
+            serializer = UsersSerializer(user, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+# ============================================================================== #
+# ============================================================================== #
+# ============================================================================== #
 # ENDPOINTS USERS
 
 
