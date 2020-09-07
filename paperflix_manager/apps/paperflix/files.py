@@ -4,9 +4,11 @@ import base64
 import bz2
 import os
 
+
 #=======================================================================
 #=======================================================================
 #=======================================================================
+
 
 class FilesDB:
 	
@@ -18,7 +20,7 @@ class FilesDB:
 		self.db = 'files.sqlite3'
 	
 	# Creates: =========================================================
-	
+
 	def createDatabase(self, table_name):
 		
 		self.con = sqlite3.connect(self.db)
@@ -85,7 +87,6 @@ class FilesDB:
 		data = self.encode(file_).decode()
 		
 		return data
-
 
 
 files_db = FilesDB()

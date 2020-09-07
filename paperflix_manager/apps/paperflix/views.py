@@ -230,15 +230,18 @@ def papersuser_update(request, id_user=None):
 @api_view(['POST'])
 def paper_create(request):
     data = request.data.pop('selectedFile')
-    serializer = PapersSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        serializer_dict = serializer.data
-        serializer_dict['message'] = 'Paper creado correctamente'
-        files_db.setFile(serializer_dict['id_paper'], data)
-        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    if 'data:application/pdf;base64,' in data:
+        serializer = PapersSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            serializer_dict = serializer.data
+            serializer_dict['message'] = 'Paper creado correctamente'
+            files_db.setFile(serializer_dict['id_paper'], data)
+            return Response(serializer_dict, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response("El archivo debe ser base64", status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
