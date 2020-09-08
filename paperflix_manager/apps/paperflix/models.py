@@ -61,7 +61,7 @@ class PapersUser(models.Model):
 
 class Categories(models.Model):
     id_category = models.AutoField(primary_key=True)
-    category = models.CharField('Categoria', max_length=255, blank=False, null=False)
+    category = models.CharField('Categoria', unique=True, max_length=255, blank=False, null=False)
     status = models.BooleanField('Activo/Inactivo', default=True)
 
 
