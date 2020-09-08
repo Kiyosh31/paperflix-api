@@ -80,6 +80,17 @@ class FilesDB:
 		self.con.close()
 		
 		return file_
+
+	def deleteFile(self, id_paper):
+		self.con = sqlite3.connect(self.db)
+		self.cur = self.con.cursor()
+
+		SQL = 'DELETE FROM Files WHERE id_paper={};'.format(id_paper)
+		self.cur.execute(SQL)
+		self.con.commit()
+
+		self.cur.close()
+		self.con.close()
 	
 	def getFileb64(self, id_paper):
 		

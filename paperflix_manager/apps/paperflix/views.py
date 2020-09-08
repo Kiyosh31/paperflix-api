@@ -276,6 +276,18 @@ def paper_update(request, id_paper=None):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['DELETE'])
+def paper_delete(request, id_paper=None):
+    try:
+        paper = Papers.objects.get(id_paper=id_paper)
+        paper.delete()
+        files_db.deleteFile(id_paper=id_paper)
+        return Response('Paper eliminado correctamente', status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
+
 # ============================================================================== #
 # ============================================================================== #
 # ============================================================================== #
