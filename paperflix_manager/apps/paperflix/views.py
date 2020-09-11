@@ -46,8 +46,11 @@ def api_overview(request):
 
 @api_view(['POST'])
 def showb64file(request):
-    b64file = files_db.getFileb64(request.data.get('id_paper'))
-    return Response(b64file, status=status.HTTP_200_OK)
+    try:
+        b64file = files_db.getFileb64(request.data.get('id_paper'))
+        return Response(b64file, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 # ============================================================================== #
 # ============================================================================== #
