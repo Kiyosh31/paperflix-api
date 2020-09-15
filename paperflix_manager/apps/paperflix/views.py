@@ -267,7 +267,7 @@ def paper_detail(request, id_paper=None):
         return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['PATCH'])
+@api_view(['PUT'])
 def paper_update(request, id_paper=None):
     paper = Papers.objects.get(id_paper=id_paper)
     serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
