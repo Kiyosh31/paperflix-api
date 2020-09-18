@@ -33,7 +33,6 @@ class Papers(models.Model):
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
     publication_year = models.IntegerField('Fecha de publicacion', blank=False, null=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
-    language = models.CharField("Idioma", max_length=255, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Papers'
