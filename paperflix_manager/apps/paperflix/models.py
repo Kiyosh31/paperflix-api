@@ -27,8 +27,15 @@ class Users(models.Model):
         return self.name
 
 
+class Categories(models.Model):
+    id_category = models.AutoField(primary_key=True)
+    category = models.CharField('Categoria', unique=True, max_length=255, blank=False, null=False)
+    status = models.BooleanField('Activo/Inactivo', default=True)
+
+
 class Papers(models.Model):
     id_paper = models.AutoField(primary_key=True)
+    id_category = models.ForeignKey(Categories, on_delete=models.CASCADE)
     title = models.CharField('Titulo', max_length=255, blank=False, null=False)
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
     publication_year = models.IntegerField('Fecha de publicacion', blank=False, null=False)
@@ -53,9 +60,4 @@ class PapersUser(models.Model):
         verbose_name = 'Paper'
         verbose_name_plural = 'Papers'
 
-
-class Categories(models.Model):
-    id_category = models.AutoField(primary_key=True)
-    category = models.CharField('Categoria', unique=True, max_length=255, blank=False, null=False)
-    status = models.BooleanField('Activo/Inactivo', default=True)
 
