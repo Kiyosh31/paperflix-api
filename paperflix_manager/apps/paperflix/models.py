@@ -33,6 +33,7 @@ class Papers(models.Model):
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
     publication_year = models.IntegerField('Fecha de publicacion', blank=False, null=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
+    url = models.CharField('URL', max_length=255, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Papers'
