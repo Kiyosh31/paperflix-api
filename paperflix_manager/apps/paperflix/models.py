@@ -34,11 +34,6 @@ class Papers(models.Model):
     publication_year = models.IntegerField('Fecha de publicacion', blank=False, null=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
     language = models.CharField("Idioma", max_length=255, blank=False, null=False)
-    number_pages = models.IntegerField(null=True)
-    viewed = models.IntegerField(null=True)
-    downloads = models.IntegerField(null=True)
-    pos_rate = models.IntegerField(null=True)
-    neg_rate = models.IntegerField(null=True)
 
     class Meta:
         verbose_name = 'Papers'
@@ -52,7 +47,7 @@ class PapersUser(models.Model):
     id_papersuser = models.AutoField(primary_key=True)
     id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
     id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
-    rated = models.IntegerField()
+    rating = models.IntegerField()
 
     class Meta:
         verbose_name = 'Paper'

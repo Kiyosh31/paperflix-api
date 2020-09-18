@@ -7,9 +7,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from .serializers import *
 from .models import *
 
-from .files import files_db
-
-
 @api_view(['GET'])
 def api_overview(request):
     api_urls = {
@@ -43,14 +40,6 @@ def api_overview(request):
 
     return Response(api_urls)
 
-
-@api_view(['POST'])
-def showb64file(request):
-    try:
-        b64file = files_db.getFileb64(request.data.get('id_paper'))
-        return Response(b64file, status=status.HTTP_200_OK)
-    except ObjectDoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -232,19 +221,14 @@ def papersuser_update(request, id_user=None):
 
 @api_view(['POST'])
 def paper_create(request):
-    data = request.data.pop('selectedFile')
-    if 'data:application/pdf;base64,' in data:
-        serializer = PapersSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Paper creado correctamente'
-            files_db.setFile(serializer_dict['id_paper'], data)
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = PapersSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Paper creado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
-        return Response("El archivo debe ser base64", status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
