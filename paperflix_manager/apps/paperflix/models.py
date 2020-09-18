@@ -38,7 +38,7 @@ class Papers(models.Model):
     id_category = models.ForeignKey(Categories, on_delete=models.CASCADE)
     title = models.CharField('Titulo', max_length=255, blank=False, null=False)
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
-    publication_year = models.IntegerField('Fecha de publicacion', blank=False, null=False)
+    publication_year = models.DateField('Fecha de publicacion', auto_now=False, auto_now_add=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
     url = models.CharField('URL', max_length=255, blank=False, null=False)
 
