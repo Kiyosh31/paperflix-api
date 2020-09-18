@@ -59,8 +59,3 @@ class Categories(models.Model):
     category = models.CharField('Categoria', unique=True, max_length=255, blank=False, null=False)
     status = models.BooleanField('Activo/Inactivo', default=True)
 
-
-class CategoryPaper(models.Model):
-    id_categorypaper = models.AutoField(primary_key=True)
-    id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
-    id_category = models.ForeignKey(Categories, on_delete=models.CASCADE)
