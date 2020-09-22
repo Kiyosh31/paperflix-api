@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password, check_password
+import json
 
 from .serializers import *
 from .models import *
@@ -40,6 +41,19 @@ def api_overview(request):
 
     return Response(api_urls)
 
+
+@api_view(['GET'])
+def papers_get(request):
+    try:
+        papers = {}
+        categories = Categories.objects.filter(status=True)
+        for category in categories:
+            paper = Papers.objects.filter(id_category=category.id_category)
+            list_result = [dict(entry, **{"category_name": category.category}) for entry in paper.values()]
+            papers[category.category] = list_result
+        return Response(papers, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -192,18 +206,20 @@ def papersuser_list(request):
 
 
 @api_view(['GET'])
-def papersuser_detail(request, id_user=None):
+def papersuser_detail(request, id_user=None, id_paper=None):
     try:
-        history = PapersUser.objects.get(id_user=id_user)
+        history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
         serializer = PapersUserSerializer(history, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
+    except IndexError:
+        return Response('La calificacion no existe', status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['PATCH'])
-def papersuser_update(request, id_user=None):
-    history = PapersUser.objects.get(id_user=id_user)
+def papersuser_update(request, id_user=None, id_paper=None):
+    history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
     serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
@@ -253,6 +269,7 @@ def paper_detail(request, id_paper=None):
 
 @api_view(['PUT'])
 def paper_update(request, id_paper=None):
+    print(request.data)
     paper = Papers.objects.get(id_paper=id_paper)
     serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
     if serializer.is_valid():

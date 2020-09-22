@@ -16,14 +16,16 @@ urlpatterns = [
 
     path('papersuser-create/', papersuser_create, name='papersuser-create'),
     path('papersuser-list/', papersuser_list, name='papersuser-list'),
-    path('papersuser-detail/<int:id_user>/', papersuser_detail, name='papersuser-detail'),
-    path('papersuser-update/<int:id_user>/', papersuser_update, name='papersuser-update'),
+    path('papersuser-detail/<int:id_user>/<int:id_paper>/', papersuser_detail, name='papersuser-detail'),
+    path('papersuser-update/<int:id_user>/<int:id_paper>/', papersuser_update, name='papersuser-update'),
 
     path('paper-create/', paper_create, name='papers-create'),
     path('paper-list/', paper_list, name='papers-list'),
     path('paper-detail/<int:id_paper>/', paper_detail, name='papers-detail'),
     path('paper-update/<int:id_paper>/', paper_update, name='papers-update'),
     path('paper-delete/<int:id_paper>/', paper_delete, name='papers-delete'),
+
+    path('papers-get/', papers_get, name='papers-get'),
 
     path('category-create/', category_create, name='category-create'),
     path('category-list/', category_list, name='category-list'),
