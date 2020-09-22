@@ -219,15 +219,20 @@ def papersuser_detail(request, id_user=None, id_paper=None):
 
 @api_view(['PATCH'])
 def papersuser_update(request, id_user=None, id_paper=None):
-    history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
-    serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        serializer_dict = serializer.data
-        serializer_dict['message'] = 'Historial modificado correctamente'
-        return Response(serializer_dict, status=status.HTTP_201_CREATED)
-    else:
+    try:
+        history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
+        serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            serializer_dict = serializer.data
+            serializer_dict['message'] = 'Historial modificado correctamente'
+            return Response(serializer_dict, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except IndexError:
+        return Response("No encontrado", status=status.HTTP_204_NO_CONTENT)
 
 
 # ============================================================================== #
