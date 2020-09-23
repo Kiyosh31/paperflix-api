@@ -7,6 +7,7 @@ import json
 
 from .serializers import *
 from .models import *
+from .utils import *
 
 @api_view(['GET'])
 def api_overview(request):
@@ -239,6 +240,36 @@ def papersuser_update(request, id_user=None, id_paper=None):
 # ============================================================================== #
 # ============================================================================== #
 # ENDPOINTS PAPERS
+
+@api_view(['POST'])
+def paper_multiple_create(request):
+    serializers = []
+    resultados = []
+    if request.data: papers = request.data
+    else: papers = read_json('papers.json')
+    if not papers: return Response('No hay papers para cargar.', status=status.HTTP_400_BAD_REQUEST)
+    total = len(papers)
+    allpapers = Papers.objects.all()
+    for paper in papers:
+        xD = allpapers.filter(title=paper['title'], publication_year=paper['publication_year'])
+        if xD:
+            total-=1
+            continue
+        try: serializers.append(PapersSerializer(data=paper))
+        except: return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
+        if not serializers[-1].is_valid():
+            resultados.append('Error en: ' + paper['title'])
+            resultados.append(serializers[-1].errors)
+    if resultados:
+        return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        if total:
+            for serializer in serializers: serializer.save()
+            context = 'Total: ' + str(total) + '. Todos los Datos Fueron Cargados Correctamente.'
+            return Response(context, status=status.HTTP_201_CREATED)
+        else:
+            return Response('Total: 0. La Base de Datos esta Actualizada.', status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def paper_create(request):

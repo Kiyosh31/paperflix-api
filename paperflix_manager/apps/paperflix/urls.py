@@ -19,6 +19,7 @@ urlpatterns = [
     path('papersuser-detail/<int:id_user>/<int:id_paper>/', papersuser_detail, name='papersuser-detail'),
     path('papersuser-update/<int:id_user>/<int:id_paper>/', papersuser_update, name='papersuser-update'),
 
+    path('paper-multiple-create/', paper_multiple_create, name='papers-multiple-create'),
     path('paper-create/', paper_create, name='papers-create'),
     path('paper-list/', paper_list, name='papers-list'),
     path('paper-detail/<int:id_paper>/', paper_detail, name='papers-detail'),
