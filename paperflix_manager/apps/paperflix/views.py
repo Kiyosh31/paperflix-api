@@ -42,19 +42,6 @@ def api_overview(request):
     return Response(api_urls)
 
 
-@api_view(['GET'])
-def papers_get(request):
-    try:
-        papers = {}
-        categories = Categories.objects.filter(status=True)
-        for category in categories:
-            paper = Papers.objects.filter(id_category=category.id_category)
-            list_result = [dict(entry, **{"category_name": category.category}) for entry in paper.values()]
-            papers[category.category] = list_result
-        return Response(papers, status=status.HTTP_200_OK)
-    except ObjectDoesNotExist:
-        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
-
 # ============================================================================== #
 # ============================================================================== #
 # ============================================================================== #
@@ -183,8 +170,10 @@ def user_activate(request, id_user=None):
 # ============================================================================== #
 # ENDPOINTS PAPERS_USER
 
+
 @api_view(['POST'])
 def papersuser_create(request):
+    print(request.data)
     serializer = PapersUserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -210,6 +199,7 @@ def papersuser_detail(request, id_user=None, id_paper=None):
     try:
         history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
         serializer = PapersUserSerializer(history, many=False)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
