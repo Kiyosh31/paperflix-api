@@ -267,9 +267,9 @@ def paper_detail(request, id_paper=None):
 
 @api_view(['POST'])
 def papers_search(request):
-    print(request.data)
     try:
-        papers = Papers.objects.get(title=request.data)
+        papers = Papers.objects.filter(title__contains=request.data['search'])
+        papers |= Papers.objects.filter(author__contains=request.data['search'])
         serializer = PapersSerializer(instance=papers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
