@@ -23,10 +23,9 @@ urlpatterns = [
     path('paper-create/', paper_create, name='papers-create'),
     path('paper-list/', paper_list, name='papers-list'),
     path('paper-detail/<int:id_paper>/', paper_detail, name='papers-detail'),
+    path('papers-search/', papers_search, name='papers-search'),
     path('paper-update/<int:id_paper>/', paper_update, name='papers-update'),
     path('paper-delete/<int:id_paper>/', paper_delete, name='papers-delete'),
-
-    path('papers-get/', papers_get, name='papers-get'),
 
     path('category-create/', category_create, name='category-create'),
     path('category-list/', category_list, name='category-list'),

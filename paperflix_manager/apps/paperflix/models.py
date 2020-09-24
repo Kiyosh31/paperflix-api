@@ -38,7 +38,7 @@ class Papers(models.Model):
     id_category = models.ForeignKey(Categories, on_delete=models.CASCADE)
     title = models.CharField('Titulo', max_length=255, blank=False, null=False)
     description = models.CharField('Descripcion', max_length=255, blank=False, null=False)
-    publication_year = models.DateField('Fecha de publicacion', auto_now=False, auto_now_add=False)
+    publication_year = models.CharField('Fecha de publicacion', max_length=255, blank=False, null=False)
     author = models.CharField('Autor', max_length=255, blank=False, null=False)
     url = models.CharField('URL', max_length=255, blank=False, null=False)
 
@@ -52,8 +52,8 @@ class Papers(models.Model):
 
 class PapersUser(models.Model):
     id_papersuser = models.AutoField(primary_key=True)
-    id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
+    id_user = models.IntegerField()
+    id_paper = models.IntegerField()
     rating = models.IntegerField()
 
     class Meta:
