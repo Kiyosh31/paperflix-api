@@ -3,10 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password, check_password
-import json
 
 from .serializers import *
 from .models import *
+
 
 @api_view(['GET'])
 def api_overview(request):
@@ -245,8 +245,8 @@ def paper_create(request):
 @api_view(['GET'])
 def paper_list(request):
     try:
-        paper = Papers.objects.all()
-        serializer = PapersSerializer(paper, many=True)
+        papers = Papers.objects.all()
+        serializer = PapersSerializer(papers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
@@ -256,15 +256,25 @@ def paper_list(request):
 def paper_detail(request, id_paper=None):
     try:
         paper = Papers.objects.get(id_paper=id_paper)
-        serializer = PapersSerializer(paper, many=False)
+        serializer = PapersSerializer(instance=paper, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['POST'])
+def papers_search(request):
+    print(request.data)
+    try:
+        papers = Papers.objects.get(title=request.data)
+        serializer = PapersSerializer(instance=papers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response("Papers no encontrados", status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['PUT'])
 def paper_update(request, id_paper=None):
-    print(request.data)
     paper = Papers.objects.get(id_paper=id_paper)
     serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
     if serializer.is_valid():
