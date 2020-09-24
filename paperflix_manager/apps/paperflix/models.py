@@ -52,8 +52,8 @@ class Papers(models.Model):
 
 class PapersUser(models.Model):
     id_papersuser = models.AutoField(primary_key=True)
-    id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
-    id_paper = models.ForeignKey(Papers, on_delete=models.CASCADE)
+    id_user = models.IntegerField()
+    id_paper = models.IntegerField()
     rating = models.IntegerField()
 
     class Meta:

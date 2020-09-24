@@ -126,7 +126,10 @@ def user_create(request):
 
 
 @api_view(['PATCH'])
-def user_update(request, id_user):
+def user_update(request, id_user=None):
+    if 'password' in request.data:
+        request.data['password'] = make_password(request.data['password'])
+
     user = Users.objects.get(id_user=id_user)
     serializer = UsersSerializer(instance=user, data=request.data, partial=True)
     if serializer.is_valid():
