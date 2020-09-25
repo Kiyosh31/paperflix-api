@@ -54,7 +54,7 @@ class PapersUser(models.Model):
     id_papersuser = models.AutoField(primary_key=True)
     id_user = models.IntegerField()
     id_paper = models.IntegerField()
-    rating = models.IntegerField()
+    rating = models.FloatField()
 
     class Meta:
         verbose_name = 'Paper'

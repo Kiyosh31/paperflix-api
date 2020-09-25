@@ -255,8 +255,10 @@ def paper_multiple_create(request):
         if xD:
             total-=1
             continue
-        try: serializers.append(PapersSerializer(data=paper))
-        except: return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializers.append(PapersSerializer(data=paper))
+        except:
+            return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
         if not serializers[-1].is_valid():
             resultados.append('Error en: ' + paper['title'])
             resultados.append(serializers[-1].errors)
@@ -264,7 +266,9 @@ def paper_multiple_create(request):
         return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
     else:
         if total:
-            for serializer in serializers: serializer.save()
+            for i, serializer in enumerate(serializers):
+                serializer.save()
+                print('[*] Paper: '+str(i + 1) + '/' + str(total) + '         ')
             context = 'Total: ' + str(total) + '. Todos los Datos Fueron Cargados Correctamente.'
             return Response(context, status=status.HTTP_201_CREATED)
         else:
@@ -306,8 +310,8 @@ def paper_detail(request, id_paper=None):
 @api_view(['POST'])
 def papers_search(request):
     try:
-        papers = Papers.objects.filter(title__contains=request.data['search'])
-        papers |= Papers.objects.filter(author__contains=request.data['search'])
+        papers = Papers.objects.filter(title__icontains=request.data['search'])
+        papers |= Papers.objects.filter(author__icontains=request.data['search'])
         serializer = PapersSerializer(instance=papers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
@@ -370,8 +374,9 @@ def category_multiple_create(request):
         return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
     else:
         if total:
-            for serializer in serializers:
+            for i, serializer in enumerate(serializers):
                 serializer.save()
+                print('[*] Category: ' + str(i + 1) + '/' + str(total) + '         ')
             context = 'Total: ' + str(total) + '. Todos los Datos Fueron Cargados Correctamente.'
             return Response(context, status=status.HTTP_201_CREATED)
         else:
