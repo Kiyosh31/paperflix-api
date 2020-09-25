@@ -73,6 +73,8 @@ def admin_user_login(request):
             return Response(status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    except IndexError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -106,11 +108,16 @@ def user_login(request):
         user = Users.objects.filter(email=request.data['email'])[0]
         if check_password(request.data['password'], user.password):
             serializer = UsersSerializer(user, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if user.status:
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    except IndexError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -242,9 +249,9 @@ def paper_multiple_create(request):
     else: papers = read_json('papers.json')
     if not papers: return Response('No hay papers para cargar.', status=status.HTTP_400_BAD_REQUEST)
     total = len(papers)
-    allpapers = Papers.objects.all()
+    all_papers = Papers.objects.all()
     for paper in papers:
-        xD = allpapers.filter(title=paper['title'], publication_year=paper['publication_year'])
+        xD = all_papers.filter(title=paper['title'], publication_year=paper['publication_year'])
         if xD:
             total-=1
             continue
@@ -335,6 +342,41 @@ def paper_delete(request, id_paper=None):
 # ============================================================================== #
 # ============================================================================== #
 # ENDPOINTS CATEGORIES
+
+@api_view(['POST'])
+def category_multiple_create(request):
+    serializers = []
+    resultados = []
+    if request.data:
+        categories = request.data
+    else:
+        categories = read_json('categores.json')
+    if not categories:
+        return Response('No hay categoias para cargar.', status=status.HTTP_400_BAD_REQUEST)
+    total = len(categories)
+    all_categories = Categories.objects.all()
+    for category in categories:
+        if all_categories.filter(category=category['category']):
+            total -= 1
+            continue
+        try:
+            serializers.append(CategoriesSerializer(data=category))
+        except:
+            return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
+        if not serializers[-1].is_valid():
+            resultados.append('Error en: ' + category['category'])
+            resultados.append(serializers[-1].errors)
+    if resultados:
+        return Response(resultados, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        if total:
+            for serializer in serializers:
+                serializer.save()
+            context = 'Total: ' + str(total) + '. Todos los Datos Fueron Cargados Correctamente.'
+            return Response(context, status=status.HTTP_201_CREATED)
+        else:
+            return Response('Total: 0. La Base de Datos esta Actualizada.', status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def category_create(request):

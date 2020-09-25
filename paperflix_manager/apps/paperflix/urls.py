@@ -27,6 +27,7 @@ urlpatterns = [
     path('paper-update/<int:id_paper>/', paper_update, name='papers-update'),
     path('paper-delete/<int:id_paper>/', paper_delete, name='papers-delete'),
 
+    path('category-multiple-create/', category_multiple_create, name='categories-multiple-create'),
     path('category-create/', category_create, name='category-create'),
     path('category-list/', category_list, name='category-list'),
     path('category-detail/<int:id_category>/', category_detail, name='category-detail'),
