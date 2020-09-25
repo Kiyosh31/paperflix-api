@@ -184,7 +184,6 @@ def user_activate(request, id_user=None):
 
 @api_view(['POST'])
 def papersuser_create(request):
-    print(request.data)
     serializer = PapersUserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
