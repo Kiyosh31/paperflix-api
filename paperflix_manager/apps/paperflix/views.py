@@ -307,7 +307,7 @@ def paper_detail(request, id_paper=None):
 
 
 @api_view(['POST'])
-def papers_search(request):
+def paper_search(request):
     try:
         papers = Papers.objects.filter(title__icontains=request.data['search'])
         papers |= Papers.objects.filter(author__icontains=request.data['search'])
@@ -335,7 +335,6 @@ def paper_delete(request, id_paper=None):
     try:
         paper = Papers.objects.get(id_paper=id_paper)
         paper.delete()
-        files_db.deleteFile(id_paper=id_paper)
         return Response('Paper eliminado correctamente', status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
@@ -407,7 +406,7 @@ def category_list(request):
 @api_view(['GET'])
 def category_detail(request, id_category=None):
     try:
-        category = Categories.objects.get(id_category=id_category)
+        category = Categories.objects.get(id_category=id_category, status=True)
         serializer = CategoriesSerializer(category, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
