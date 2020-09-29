@@ -108,16 +108,13 @@ def user_login(request):
         user = Users.objects.filter(email=request.data['email'])[0]
         if check_password(request.data['password'], user.password):
             serializer = UsersSerializer(user, many=False)
-            if user.status:
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response("Contraseña incorrecta", status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response("El objeto no existe", status=status.HTTP_404_NOT_FOUND)
     except IndexError:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response("IndexError", status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
