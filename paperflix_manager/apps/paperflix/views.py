@@ -108,7 +108,12 @@ def user_login(request):
         user = Users.objects.filter(email=request.data['email'])[0]
         if check_password(request.data['password'], user.password):
             serializer = UsersSerializer(user, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if user.status:
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                serializer_dict = serializer.data
+                serializer_dict['message'] = 'Usuario Inactivo'
+                return Response(serializer_dict, status=status.HTTP_201_CREATED)
         else:
             return Response("Contraseña incorrecta", status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
