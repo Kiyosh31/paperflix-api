@@ -22,6 +22,7 @@ urlpatterns = [
     path('paper-multiple-create/', paper_multiple_create, name='papers-multiple-create'),
     path('paper-create/', paper_create, name='papers-create'),
     path('paper-list/', paper_list, name='papers-list'),
+    path('paper-latest/', paper_latest, name='papers-latest'),
     path('paper-detail/<int:id_paper>/', paper_detail, name='papers-detail'),
     path('paper-search/', paper_search, name='papers-search'),
     path('paper-update/<int:id_paper>/', paper_update, name='papers-update'),

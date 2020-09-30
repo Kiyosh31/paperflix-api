@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password, check_password
+from datetime import datetime
 
 from .serializers import *
 from .models import *
@@ -176,16 +177,6 @@ def user_activate(request):
     except IndexError:
         return Response({'message': 'No se encontro la cuenta'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # user = Users.objects.get(id_user=id_user)
-    # request.data['status'] = True
-    # serializer = UsersSerializer(instance=user, data=request.data, partial=True)
-    # if serializer.is_valid():
-    #     serializer.save()
-    #     serializer_dict = serializer.data
-    #     serializer_dict['message'] = 'Usuario activado correctamente'
-    #     return Response(serializer_dict, status=status.HTTP_201_CREATED)
-    # else:
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -301,6 +292,16 @@ def paper_create(request):
 def paper_list(request):
     try:
         papers = Papers.objects.all()
+        serializer = PapersSerializer(papers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def paper_latest(request):
+    try:
+        papers = Papers.objects.order_by('-publication_year')
         serializer = PapersSerializer(papers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
