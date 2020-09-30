@@ -105,21 +105,14 @@ def user_detail(request, id_user=None):
 @api_view(['POST'])
 def user_login(request):
     try:
-        user = Users.objects.filter(email=request.data['email'])[0]
+        user = Users.objects.filter(email=request.data['email'], status=True)[0]
         if check_password(request.data['password'], user.password):
             serializer = UsersSerializer(user, many=False)
-            if user.status:
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                serializer_dict = serializer.data
-                serializer_dict['message'] = 'Usuario Inactivo'
-                return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response("Contraseña incorrecta", status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
-        return Response("El objeto no existe", status=status.HTTP_404_NOT_FOUND)
+        return Response({'message': 'El objeto no existe'}, status=status.HTTP_404_NOT_FOUND)
     except IndexError:
-        return Response("IndexError", status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'No se encontro la cuenta'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -166,17 +159,33 @@ def user_delete(request, id_user):
 
 
 @api_view(['PATCH'])
-def user_activate(request, id_user=None):
-    user = Users.objects.get(id_user=id_user)
-    request.data['status'] = True
-    serializer = UsersSerializer(instance=user, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        serializer_dict = serializer.data
-        serializer_dict['message'] = 'Usuario activado correctamente'
-        return Response(serializer_dict, status=status.HTTP_201_CREATED)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def user_activate(request):
+    try:
+        user = Users.objects.filter(email=request.data['email'])[0]
+        if check_password(request.data['password'], user.password):
+            request.data['status'] = True
+            request.data['password'] = make_password(request.data['password'])
+            serializer = UsersSerializer(instance=user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                serializer_dict = serializer.data
+                serializer_dict['message'] = 'Usuario activado correctamente'
+                return Response(serializer_dict, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response({'message': 'El objeto no existe'}, status=status.HTTP_404_NOT_FOUND)
+    except IndexError:
+        return Response({'message': 'No se encontro la cuenta'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # user = Users.objects.get(id_user=id_user)
+    # request.data['status'] = True
+    # serializer = UsersSerializer(instance=user, data=request.data, partial=True)
+    # if serializer.is_valid():
+    #     serializer.save()
+    #     serializer_dict = serializer.data
+    #     serializer_dict['message'] = 'Usuario activado correctamente'
+    #     return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    # else:
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # ============================================================================== #
 # ============================================================================== #

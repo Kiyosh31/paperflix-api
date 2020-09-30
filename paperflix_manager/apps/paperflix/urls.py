@@ -12,7 +12,7 @@ urlpatterns = [
     path('user-create/', user_create, name='user-create'),
     path('user-update/<int:id_user>/', user_update, name='user-update'),
     path('user-delete/<int:id_user>/', user_delete, name='user-delete'),
-    path('user-activate/<int:id_user>/', user_activate, name='user-activate'),
+    path('user-activate/', user_activate, name='user-activate'),
 
     path('papersuser-create/', papersuser_create, name='papersuser-create'),
     path('papersuser-list/', papersuser_list, name='papersuser-list'),
