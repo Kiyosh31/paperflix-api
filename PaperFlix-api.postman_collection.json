@@ -116,7 +116,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"test1@test.com\",\r\n    \"password\": \"123456\"\r\n}"
+							"raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"asdasd\"\r\n}"
 						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/user-login/",
@@ -188,7 +188,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/user-delete/2/",
+							"raw": "http://127.0.0.1:8000/api/user-delete/6/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -200,7 +200,7 @@
 							"path": [
 								"api",
 								"user-delete",
-								"2",
+								"6",
 								""
 							]
 						}
@@ -218,8 +218,12 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"asdasd\"\r\n}"
+						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/user-activate/2/",
+							"raw": "http://127.0.0.1:8000/api/user-activate/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -231,7 +235,6 @@
 							"path": [
 								"api",
 								"user-activate",
-								"2",
 								""
 							]
 						}
@@ -463,6 +466,30 @@
 							"path": [
 								"api",
 								"paper-multiple-create",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET LATEST",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/paper-latest/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"paper-latest",
 								""
 							]
 						}
