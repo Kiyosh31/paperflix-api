@@ -351,6 +351,17 @@ def paper_delete(request, id_paper=None):
     except ObjectDoesNotExist:
         return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+def paper_pagination(request, id_category=None, last_paper=None):
+    try:
+        papers = Papers.objects.filter(id_category=id_category)[last_paper: last_paper + 20]
+        serializer = PapersSerializer(papers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Papers no encontrados', status=status.HTTP_404_NOT_FOUND)
+    except IndexError:
+        return Response('IndexError', status=status.HTTP_404_NOT_FOUND)
+
 
 # ============================================================================== #
 # ============================================================================== #
