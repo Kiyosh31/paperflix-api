@@ -10,6 +10,13 @@ class AdminUsers(models.Model):
     status = models.BooleanField('Activo/Inactivo', default=True)
     created_at = models.DateField('Fecha de creacion', auto_now=False, auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Administrador'
+        verbose_name_plural = 'Administradores'
+
+    def __str__(self):
+        return self.name
+
 
 class Users(models.Model):
     id_user = models.AutoField(primary_key=True)
@@ -27,10 +34,30 @@ class Users(models.Model):
         return self.name
 
 
+class Cookies(models.Model):
+    id_user = models.IntegerField()
+    cookie = models.CharField('Cookie', unique=True, max_length=255, blank=False, null=False)
+    created_at = models.DateField('Fecha de creacion', auto_now=False, auto_now_add=True)
+
+    class Meta:
+        verbose_name='Cookie'
+        verbose_name_plural='Cookies'
+
+    def __str__(self):
+        return self.cookie
+
+
 class Categories(models.Model):
     id_category = models.AutoField(primary_key=True)
     category = models.CharField('Categoria', unique=True, max_length=255, blank=False, null=False)
     status = models.BooleanField('Activo/Inactivo', default=True)
+
+    class Meta:
+        verbose_name='Categoria'
+        verbose_name_plural='Categorias'
+
+    def __str__(self):
+        return self.category
 
 
 class Papers(models.Model):
@@ -59,5 +86,3 @@ class PapersUser(models.Model):
     class Meta:
         verbose_name = 'Paper'
         verbose_name_plural = 'Papers'
-
-

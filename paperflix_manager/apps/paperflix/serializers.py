@@ -14,6 +14,12 @@ class UsersSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CookiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cookies
+        fields = '__all__'
+
+
 class PapersUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = PapersUser
