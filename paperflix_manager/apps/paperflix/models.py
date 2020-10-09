@@ -35,6 +35,7 @@ class Users(models.Model):
 
 
 class Cookies(models.Model):
+    id_cookie = models.AutoField(primary_key=True)
     id_user = models.IntegerField()
     cookie = models.CharField('Cookie', unique=True, max_length=255, blank=False, null=False)
     created_at = models.DateField('Fecha de creacion', auto_now=False, auto_now_add=True)

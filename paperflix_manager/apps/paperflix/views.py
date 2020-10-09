@@ -74,6 +74,14 @@ def is_admin_logged_in(cookie):
     else:
         return False
 
+def delete_cookie():
+    try:
+        cookie = Cookies.objects.get(id_paper=id_paper)
+        paper.delete()
+        return Response('Paper eliminado correctamente', status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
 # ============================================================================== #
 # ============================================================================== #
 # ============================================================================== #
@@ -141,30 +149,29 @@ def user_detail(request, id_user=None):
 
 @api_view(['POST'])
 def user_login(request):
-    user = None
     try:
         user = Users.objects.filter(email=request.data['email'], status=True)[0]
+        if check_password(request.data['password'], user.password):
+            try:
+                cookie = Cookies.objects.get(id_user=user.id_user)
+                serialized_cookie = CookiesSerializer(instance=cookie, many=False)
+                return Response(serialized_cookie.data, status=status.HTTP_200_OK)
+            except (ObjectDoesNotExist, IndexError):
+                hashed_cookie = make_password(user.name + request.data['password'])
+                data = {'id_user': user.id_user, 'cookie': hashed_cookie}
+                serialized_new_cookie = CookiesSerializer(data=data)
+                if serialized_new_cookie.is_valid():
+                    serialized_new_cookie.save()
+                    return Response(serialized_new_cookie.data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response("error", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'message': 'Contraseña incorecta'}, status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
         return Response({'message': 'El usuario no existe'}, status=status.HTTP_404_NOT_FOUND)
     except IndexError:
         return Response({'message': 'IndexError'}, status=status.HTTP_400_BAD_REQUEST)
 
-    if check_password(request.data['password'], user.password):
-        try:
-            cookie = Cookies.objects.get(id_user=user.id_user)
-            serializer = CookiesSerializer(instance=cookie, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            hashed_cookie = make_password(user.name + request.data['password'])
-            data = {'id_user': user.id_user, 'cookie': hashed_cookie}
-            serializer = CookiesSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                serializer_dict = serializer.data
-                serializer_dict['message'] = 'Usuario logeado correctamente'
-                return Response(serializer_dict, status=status.HTTP_201_CREATED)
-    else:
-        return Response({'message': 'Contraseña incorecta'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
