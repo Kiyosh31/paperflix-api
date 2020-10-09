@@ -49,11 +49,9 @@ def api_overview(request):
 # COOKIES
 
 def is_user_logged_in(cookie):
-    print(cookie)
     if 'authenticated' in cookie:
         try:
             cookie = Cookies.objects.filter(cookie=cookie.replace('authenticated=', ''))
-            print('cookie filtrada', cookie)
             if cookie:
                 return True
         except ObjectDoesNotExist:
