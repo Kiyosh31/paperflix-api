@@ -49,9 +49,11 @@ def api_overview(request):
 # COOKIES
 
 def is_user_logged_in(cookie):
+    print(cookie)
     if 'authenticated' in cookie:
         try:
-            cookie = Cookies.objects.filter(cookie=cookie['authenticated'])
+            cookie = Cookies.objects.filter(cookie=cookie.replace('authenticated=', ''))
+            print('cookie filtrada', cookie)
             if cookie:
                 return True
         except ObjectDoesNotExist:
@@ -74,13 +76,6 @@ def is_admin_logged_in(cookie):
     else:
         return False
 
-def delete_cookie():
-    try:
-        cookie = Cookies.objects.get(id_paper=id_paper)
-        paper.delete()
-        return Response('Paper eliminado correctamente', status=status.HTTP_200_OK)
-    except ObjectDoesNotExist:
-        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -241,6 +236,17 @@ def user_activate(request):
     except IndexError:
         return Response({'message': 'No se encontro la cuenta'}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def user_logout(request, id_user=None):
+    if is_user_logged_in(request.headers['Authorization']):
+        try:
+            cookie = Cookies.objects.get(id_user=id_user)
+            cookie.delete()
+            return Response('Logout Exitoso', status=status.HTTP_200_OK)
+        except (ObjectDoesNotExist, IndexError):
+            return Response('Cookie no encontrada', status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -250,7 +256,7 @@ def user_activate(request):
 
 @api_view(['POST'])
 def papersuser_create(request):
-    if is_user_logged_in(request.COOKIES):
+    if is_user_logged_in(request.headers['Authorization']):
         serializer = PapersUserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -265,7 +271,7 @@ def papersuser_create(request):
 
 @api_view(['GET'])
 def papersuser_list(request):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         try:
             history = PapersUser.objects.all()
             serializer = PapersUserSerializer(history, many=True)
@@ -278,7 +284,7 @@ def papersuser_list(request):
 
 @api_view(['GET'])
 def papersuser_detail(request, id_user=None, id_paper=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         try:
             history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
             serializer = PapersUserSerializer(history, many=False)
@@ -294,7 +300,7 @@ def papersuser_detail(request, id_user=None, id_paper=None):
 
 @api_view(['PATCH'])
 def papersuser_update(request, id_user=None, id_paper=None):
-    if is_user_logged_in(request.COOKIES):
+    if is_user_logged_in(request.headers['Authorization']):
         try:
             history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
             serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
@@ -320,7 +326,7 @@ def papersuser_update(request, id_user=None, id_paper=None):
 
 @api_view(['POST'])
 def paper_multiple_create(request):
-    if is_admin_logged_in(request.COOKIES):
+    # if is_admin_logged_in(request.headers['Authorization']):
         serializers = []
         resultados = []
         if request.data: papers = request.data
@@ -351,12 +357,12 @@ def paper_multiple_create(request):
                 return Response(context, status=status.HTTP_201_CREATED)
             else:
                 return Response('Total: 0. La Base de Datos esta Actualizada.', status=status.HTTP_200_OK)
-    else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+    # else:
+    #     return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
 def paper_create(request):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         serializer = PapersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -371,7 +377,7 @@ def paper_create(request):
 
 @api_view(['GET'])
 def paper_list(request):
-    if is_user_logged_in(request.COOKIES) or is_admin_logged_in(request.COOKIES):
+    if is_user_logged_in(request.headers['Authorization']) or is_admin_logged_in(request.headers['Authorization']):
         if is_user_logged_in(request):
             try:
                 papers = Papers.objects.all()
@@ -387,7 +393,7 @@ def paper_list(request):
 
 @api_view(['GET'])
 def paper_latest(request):
-    if is_user_logged_in(request.COOKIES):
+    if is_user_logged_in(request.headers['Authorization']):
         try:
             papers = Papers.objects.order_by('-publication_year')
             serializer = PapersSerializer(papers, many=True)
@@ -400,7 +406,7 @@ def paper_latest(request):
 
 @api_view(['GET'])
 def paper_detail(request, id_paper=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         try:
             paper = Papers.objects.get(id_paper=id_paper)
             serializer = PapersSerializer(instance=paper, many=False)
@@ -413,7 +419,7 @@ def paper_detail(request, id_paper=None):
 
 @api_view(['POST'])
 def paper_search(request):
-    if is_user_logged_in(request.COOKIES):
+    if is_user_logged_in(request.headers['Authorization']):
         try:
             papers = Papers.objects.filter(title__icontains=request.data['search'])
             papers |= Papers.objects.filter(author__icontains=request.data['search'])
@@ -427,7 +433,7 @@ def paper_search(request):
 
 @api_view(['PUT'])
 def paper_update(request, id_paper=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         paper = Papers.objects.get(id_paper=id_paper)
         serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
         if serializer.is_valid():
@@ -443,7 +449,7 @@ def paper_update(request, id_paper=None):
 
 @api_view(['DELETE'])
 def paper_delete(request, id_paper=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         try:
             paper = Papers.objects.get(id_paper=id_paper)
             paper.delete()
@@ -473,7 +479,7 @@ def paper_delete(request, id_paper=None):
 
 @api_view(['POST'])
 def category_multiple_create(request):
-    if is_admin_logged_in(request.COOKIES):
+    # if is_admin_logged_in(request.headers['Authorization']):
         serializers = []
         resultados = []
         if request.data:
@@ -506,13 +512,13 @@ def category_multiple_create(request):
                 return Response(context, status=status.HTTP_201_CREATED)
             else:
                 return Response('Total: 0. La Base de Datos esta Actualizada.', status=status.HTTP_200_OK)
-    else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+    # else:
+    #     return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
 def category_create(request):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         serializer = CategoriesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -527,7 +533,7 @@ def category_create(request):
 
 @api_view(['GET'])
 def category_list(request):
-    if is_user_logged_in(request.COOKIES) or is_admin_logged_in(request.COOKIES):
+    if is_user_logged_in(request.headers['Authorization']) or is_admin_logged_in(request.headers['Authorization']):
         try:
             category = Categories.objects.filter(status=True)
             serializer = CategoriesSerializer(category, many=True)
@@ -540,7 +546,7 @@ def category_list(request):
 
 @api_view(['GET'])
 def category_detail(request, id_category=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         try:
             category = Categories.objects.get(id_category=id_category, status=True)
             serializer = CategoriesSerializer(category, many=False)
@@ -553,7 +559,7 @@ def category_detail(request, id_category=None):
 
 @api_view(['PATCH'])
 def category_update(request, id_category=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         category = Categories.objects.get(id_category=id_category)
         serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
         if serializer.is_valid():
@@ -569,7 +575,7 @@ def category_update(request, id_category=None):
 
 @api_view(['PATCH'])
 def category_delete(request, id_category=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         category = Categories.objects.get(id_category=id_category)
         request.data['status'] = False
         serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
@@ -586,7 +592,7 @@ def category_delete(request, id_category=None):
 
 @api_view(['PATCH'])
 def category_activate(request, id_category=None):
-    if is_admin_logged_in(request.COOKIES):
+    if is_admin_logged_in(request.headers['Authorization']):
         category = Categories.objects.get(id_category=id_category)
         request.data['status'] = True
         serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)

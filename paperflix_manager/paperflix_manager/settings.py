@@ -47,6 +47,10 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:5000",
 ]
 
+CORS_ALLOW_HEADERS = [
+    'Authorization',
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
