@@ -82,7 +82,7 @@ def is_admin_logged_in(cookie):
 
 
 @api_view(['POST'])
-def admin_user_create(request):
+def admin_create(request):
     request.data['password'] = make_password(request.data['password'])
     serializer = AdminUsersSerializer(data=request.data)
     if serializer.is_valid():
@@ -95,7 +95,7 @@ def admin_user_create(request):
 
 
 @api_view(['POST'])
-def admin_user_login(request):
+def admin_login(request):
     if is_admin_logged_in(request.COOKIES):
         try:
             user = AdminUsers.objects.filter(email=request.data['email'])[0]
@@ -236,7 +236,7 @@ def user_activate(request):
 
 @api_view(['GET'])
 def user_logout(request, id_user=None):
-    if is_user_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']):
         try:
             cookie = Cookies.objects.get(id_user=id_user)
             cookie.delete()
@@ -254,7 +254,7 @@ def user_logout(request, id_user=None):
 
 @api_view(['POST'])
 def papersuser_create(request):
-    if is_user_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']):
         serializer = PapersUserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -269,7 +269,7 @@ def papersuser_create(request):
 
 @api_view(['GET'])
 def papersuser_list(request):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         try:
             history = PapersUser.objects.all()
             serializer = PapersUserSerializer(history, many=True)
@@ -282,7 +282,7 @@ def papersuser_list(request):
 
 @api_view(['GET'])
 def papersuser_detail(request, id_user=None, id_paper=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         try:
             history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
             serializer = PapersUserSerializer(history, many=False)
@@ -298,7 +298,7 @@ def papersuser_detail(request, id_user=None, id_paper=None):
 
 @api_view(['PATCH'])
 def papersuser_update(request, id_user=None, id_paper=None):
-    if is_user_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']):
         try:
             history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
             serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
@@ -324,7 +324,7 @@ def papersuser_update(request, id_user=None, id_paper=None):
 
 @api_view(['POST'])
 def paper_multiple_create(request):
-    # if is_admin_logged_in(request.headers['Authorization']):
+    # if is_admin_logged_in(request.headers['authorization']):
         serializers = []
         resultados = []
         if request.data: papers = request.data
@@ -360,7 +360,7 @@ def paper_multiple_create(request):
 
 @api_view(['POST'])
 def paper_create(request):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         serializer = PapersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -375,23 +375,20 @@ def paper_create(request):
 
 @api_view(['GET'])
 def paper_list(request):
-    if is_user_logged_in(request.headers['Authorization']) or is_admin_logged_in(request.headers['Authorization']):
-        if is_user_logged_in(request):
-            try:
-                papers = Papers.objects.all()
-                serializer = PapersSerializer(papers, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except ObjectDoesNotExist:
-                return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+    if is_user_logged_in(request.headers['authorization']):
+        try:
+            papers = Papers.objects.all()
+            serializer = PapersSerializer(papers, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
         return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
 def paper_latest(request):
-    if is_user_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']):
         try:
             papers = Papers.objects.order_by('-publication_year')
             serializer = PapersSerializer(papers, many=True)
@@ -404,7 +401,7 @@ def paper_latest(request):
 
 @api_view(['GET'])
 def paper_detail(request, id_paper=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
         try:
             paper = Papers.objects.get(id_paper=id_paper)
             serializer = PapersSerializer(instance=paper, many=False)
@@ -417,7 +414,7 @@ def paper_detail(request, id_paper=None):
 
 @api_view(['POST'])
 def paper_search(request):
-    if is_user_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']):
         try:
             papers = Papers.objects.filter(title__icontains=request.data['search'])
             papers |= Papers.objects.filter(author__icontains=request.data['search'])
@@ -431,7 +428,7 @@ def paper_search(request):
 
 @api_view(['PUT'])
 def paper_update(request, id_paper=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         paper = Papers.objects.get(id_paper=id_paper)
         serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
         if serializer.is_valid():
@@ -447,7 +444,7 @@ def paper_update(request, id_paper=None):
 
 @api_view(['DELETE'])
 def paper_delete(request, id_paper=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         try:
             paper = Papers.objects.get(id_paper=id_paper)
             paper.delete()
@@ -477,7 +474,7 @@ def paper_delete(request, id_paper=None):
 
 @api_view(['POST'])
 def category_multiple_create(request):
-    # if is_admin_logged_in(request.headers['Authorization']):
+    # if is_admin_logged_in(request.headers['authorization']):
         serializers = []
         resultados = []
         if request.data:
@@ -516,7 +513,7 @@ def category_multiple_create(request):
 
 @api_view(['POST'])
 def category_create(request):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         serializer = CategoriesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -531,7 +528,7 @@ def category_create(request):
 
 @api_view(['GET'])
 def category_list(request):
-    if is_user_logged_in(request.headers['Authorization']) or is_admin_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
         try:
             category = Categories.objects.filter(status=True)
             serializer = CategoriesSerializer(category, many=True)
@@ -544,7 +541,7 @@ def category_list(request):
 
 @api_view(['GET'])
 def category_detail(request, id_category=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
         try:
             category = Categories.objects.get(id_category=id_category, status=True)
             serializer = CategoriesSerializer(category, many=False)
@@ -557,7 +554,7 @@ def category_detail(request, id_category=None):
 
 @api_view(['PATCH'])
 def category_update(request, id_category=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         category = Categories.objects.get(id_category=id_category)
         serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
         if serializer.is_valid():
@@ -573,7 +570,7 @@ def category_update(request, id_category=None):
 
 @api_view(['PATCH'])
 def category_delete(request, id_category=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         category = Categories.objects.get(id_category=id_category)
         request.data['status'] = False
         serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
@@ -590,7 +587,7 @@ def category_delete(request, id_category=None):
 
 @api_view(['PATCH'])
 def category_activate(request, id_category=None):
-    if is_admin_logged_in(request.headers['Authorization']):
+    if is_admin_logged_in(request.headers['authorization']):
         category = Categories.objects.get(id_category=id_category)
         request.data['status'] = True
         serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
