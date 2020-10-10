@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from .serializers import *
 from .models import *
 from .utils import *
+from random import choice
 
 
 @api_view(['GET'])
@@ -182,7 +183,7 @@ def user_create(request):
 
 @api_view(['PATCH'])
 def user_update(request, id_user=None):
-    if is_user_logged_in(request.COOKIES):
+    if is_user_logged_in(request.headers['authorization']):
         if 'password' in request.data:
             request.data['password'] = make_password(request.data['password'])
 
@@ -200,8 +201,9 @@ def user_update(request, id_user=None):
 
 
 @api_view(['PATCH'])
-def user_delete(request, id_user):
-    if is_user_logged_in(request.COOKIES):
+def user_delete(request, id_user=None):
+    print(request.headers)
+    if is_user_logged_in(request.headers['authorization']):
         user = Users.objects.get(id_user=id_user)
         request.data['status'] = False
         serializer = UsersSerializer(instance=user, data=request.data, partial=True)
@@ -209,6 +211,11 @@ def user_delete(request, id_user):
             serializer.save()
             serializer_dict = serializer.data
             serializer_dict['message'] = 'Usuario eliminado correctamente'
+            try:
+                cookie = Cookies.objects.get(id_user=id_user)
+                cookie.delete()
+            except (ObjectDoesNotExist, IndexError):
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer_dict, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -269,7 +276,7 @@ def papersuser_create(request):
 
 @api_view(['GET'])
 def papersuser_list(request):
-    if is_admin_logged_in(request.headers['authorization']):
+    if is_user_logged_in(request.headers['authorization']):
         try:
             history = PapersUser.objects.all()
             serializer = PapersUserSerializer(history, many=True)
@@ -282,7 +289,7 @@ def papersuser_list(request):
 
 @api_view(['GET'])
 def papersuser_detail(request, id_user=None, id_paper=None):
-    if is_admin_logged_in(request.headers['authorization']):
+    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
         try:
             history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
             serializer = PapersUserSerializer(history, many=False)
@@ -393,6 +400,20 @@ def paper_latest(request):
             papers = Papers.objects.order_by('-publication_year')
             serializer = PapersSerializer(papers, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['GET'])
+def paper_random(request):
+    if is_user_logged_in(request.headers['authorization']):
+        try:
+            papers = Papers.objects.all()
+            random_item = choice(papers)
+            serialized_paper = PapersSerializer(instance=random_item, many=False)
+            return Response(serialized_paper.data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
