@@ -75,6 +75,13 @@ def is_admin_logged_in(cookie):
     else:
         return False
 
+def delete_cookie(id_user=None):
+    try:
+        cookie = Cookies.objects.get(id_user=id_user)
+        cookie.delete()
+        return True
+    except (ObjectDoesNotExist, IndexError):
+        return False
 
 # ============================================================================== #
 # ============================================================================== #
@@ -110,7 +117,7 @@ def admin_login(request):
         except IndexError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -138,7 +145,7 @@ def user_detail(request, id_user=None):
         except ObjectDoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -197,7 +204,7 @@ def user_update(request, id_user=None):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['DELETE'])
@@ -210,16 +217,14 @@ def user_delete(request, id_user=None):
             serializer.save()
             serializer_dict = serializer.data
             serializer_dict['message'] = 'Usuario eliminado correctamente'
-            try:
-                cookie = Cookies.objects.get(id_user=id_user)
-                cookie.delete()
-            except (ObjectDoesNotExist, IndexError):
+            if delete_cookie(id_user):
+                return Response(serializer_dict, status=status.HTTP_200_OK)
+            else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response(serializer_dict, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['PATCH'])
@@ -243,14 +248,12 @@ def user_activate(request):
 @api_view(['GET'])
 def user_logout(request, id_user=None):
     if is_user_logged_in(request.headers['authorization']):
-        try:
-            cookie = Cookies.objects.get(id_user=id_user)
-            cookie.delete()
-            return Response('Logout Exitoso', status=status.HTTP_200_OK)
-        except (ObjectDoesNotExist, IndexError):
-            return Response('Cookie no encontrada', status=status.HTTP_400_BAD_REQUEST)
+        if delete_cookie(id_user):
+            return Response({'Message': 'Logout Exitoso'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'Message': 'Cookie no encontrada'}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -270,7 +273,7 @@ def papersuser_create(request):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -283,7 +286,7 @@ def papersuser_list(request):
         except ObjectDoesNotExist:
             return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -299,7 +302,7 @@ def papersuser_detail(request, id_user=None, id_paper=None):
         except IndexError:
             return Response('La calificacion no existe', status=status.HTTP_204_NO_CONTENT)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['PATCH'])
@@ -320,7 +323,7 @@ def papersuser_update(request, id_user=None, id_paper=None):
         except IndexError:
             return Response("No encontrado", status=status.HTTP_204_NO_CONTENT)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # ============================================================================== #
@@ -362,7 +365,7 @@ def paper_multiple_create(request):
             else:
                 return Response('Total: 0. La Base de Datos esta Actualizada.', status=status.HTTP_200_OK)
     # else:
-    #     return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+    #     return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
 def paper_create(request):
@@ -376,7 +379,7 @@ def paper_create(request):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -389,7 +392,7 @@ def paper_list(request):
         except ObjectDoesNotExist:
             return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -402,7 +405,7 @@ def paper_latest(request):
         except ObjectDoesNotExist:
             return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -416,7 +419,7 @@ def paper_random(request):
         except ObjectDoesNotExist:
             return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -429,7 +432,7 @@ def paper_detail(request, id_paper=None):
         except ObjectDoesNotExist:
             return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -443,7 +446,7 @@ def paper_search(request):
         except ObjectDoesNotExist:
             return Response("Papers no encontrados", status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['PUT'])
@@ -459,7 +462,7 @@ def paper_update(request, id_paper=None):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['DELETE'])
@@ -472,7 +475,7 @@ def paper_delete(request, id_paper=None):
         except ObjectDoesNotExist:
             return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # @api_view(['GET'])
@@ -500,7 +503,7 @@ def category_multiple_create(request):
         if request.data:
             categories = request.data
         else:
-            categories = read_json('categores.json')
+            categories = read_json('categories.json')
         if not categories:
             return Response('No hay categoias para cargar.', status=status.HTTP_400_BAD_REQUEST)
         total = len(categories)
@@ -528,7 +531,7 @@ def category_multiple_create(request):
             else:
                 return Response('Total: 0. La Base de Datos esta Actualizada.', status=status.HTTP_200_OK)
     # else:
-    #     return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+    #     return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -543,7 +546,7 @@ def category_create(request):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -556,7 +559,7 @@ def category_list(request):
         except ObjectDoesNotExist:
             return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -569,7 +572,7 @@ def category_detail(request, id_category=None):
         except ObjectDoesNotExist:
             return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['PATCH'])
@@ -585,7 +588,7 @@ def category_update(request, id_category=None):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['PATCH'])
@@ -602,7 +605,7 @@ def category_delete(request, id_category=None):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['PATCH'])
@@ -619,5 +622,5 @@ def category_activate(request, id_category=None):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
