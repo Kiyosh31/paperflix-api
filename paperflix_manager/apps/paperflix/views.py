@@ -200,9 +200,8 @@ def user_update(request, id_user=None):
         return Response('Acceso denegado', status=status.HTTP_401_UNAUTHORIZED)
 
 
-@api_view(['PATCH'])
+@api_view(['DELETE'])
 def user_delete(request, id_user=None):
-    print(request.headers)
     if is_user_logged_in(request.headers['authorization']):
         user = Users.objects.get(id_user=id_user)
         request.data['status'] = False
@@ -216,7 +215,7 @@ def user_delete(request, id_user=None):
                 cookie.delete()
             except (ObjectDoesNotExist, IndexError):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
+            return Response(serializer_dict, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
