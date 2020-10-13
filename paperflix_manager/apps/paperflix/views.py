@@ -50,43 +50,13 @@ def api_overview(request):
 # COOKIES
 
 def is_user_logged_in(cookie):
-    if 'authenticated' in cookie:
-        try:
-            cookie = Cookies.objects.filter(cookie=cookie.replace('authenticated=', ''))
-            if cookie:
-                return True
-        except ObjectDoesNotExist:
-            return False
-        except IndexError:
-            return False
-    else:
+    try:
+        cookie = Cookies.objects.filter(cookie=cookie)
+        if cookie:
+            return True
+    except (ObjectDoesNotExist, IndexError):
         return False
 
-def is_admin_logged_in(cookie):
-    if 'admin' in cookie:
-        try:
-            cookie = Cookies.objects.filter(cookie=cookie['admin'])
-            if cookie:
-                return True
-        except ObjectDoesNotExist:
-            return False
-        except IndexError:
-            return False
-    else:
-        return False
-
-def isAuthenticated(func):
-    def function_call(*args, **kwargs):
-        request = args[0]
-        auth = request.headers.get('authorization')
-        if auth:
-            if is_user_logged_in(auth) or is_admin_logged_in(auth):
-                return func(*args, **kwargs)
-            else:
-                return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
-        else:
-            return Response({'Message': 'Error en los Headers: \'authorization\' es necesario.'}, status=status.HTTP_401_UNAUTHORIZED)
-    return function_call
 
 def delete_cookie(id_user=None):
     try:
@@ -95,6 +65,22 @@ def delete_cookie(id_user=None):
         return True
     except (ObjectDoesNotExist, IndexError):
         return False
+
+
+def is_authenticated(func):
+    def function_call(*args, **kwargs):
+        request = args[0]
+        auth = request.headers.get('authorization')
+        if auth:
+            if is_user_logged_in(auth):
+                return func(*args, **kwargs)
+            else:
+                return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'Message': 'Error en los Headers: \'authorization\' es necesario.'}, status=status.HTTP_401_UNAUTHORIZED)
+    return function_call
+
+
 
 # ============================================================================== #
 # ============================================================================== #
@@ -116,21 +102,19 @@ def admin_create(request):
 
 
 @api_view(['POST'])
+@is_authenticated
 def admin_login(request):
-    if is_admin_logged_in(request.COOKIES):
-        try:
-            user = AdminUsers.objects.filter(email=request.data['email'])[0]
-            if check_password(request.data['password'], user.password):
-                serializer = UsersSerializer(user, many=False)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-        except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except IndexError:
+    try:
+        user = AdminUsers.objects.filter(email=request.data['email'])[0]
+        if check_password(request.data['password'], user.password):
+            serializer = UsersSerializer(user, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    except IndexError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -149,16 +133,15 @@ def admin_login(request):
 
 
 @api_view(['GET'])
+@is_authenticated
 def user_detail(request, id_user=None):
-    if is_user_logged_in(request.COOKIES):
-        try:
-            user = Users.objects.get(id_user=id_user)
-            serializer = UsersSerializer(user, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        user = Users.objects.get(id_user=id_user)
+        serializer = UsersSerializer(user, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['POST'])
@@ -202,42 +185,40 @@ def user_create(request):
 
 
 @api_view(['PATCH'])
+@is_authenticated
 def user_update(request, id_user=None):
-    if is_user_logged_in(request.headers['authorization']):
-        if 'password' in request.data:
-            request.data['password'] = make_password(request.data['password'])
+    if 'password' in request.data:
+        request.data['password'] = make_password(request.data['password'])
 
-        user = Users.objects.get(id_user=id_user)
-        serializer = UsersSerializer(instance=user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Usuario modificado correctamente'
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    user = Users.objects.get(id_user=id_user)
+    serializer = UsersSerializer(instance=user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Usuario modificado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['DELETE'])
+@is_authenticated
 def user_delete(request, id_user=None):
-    if is_user_logged_in(request.headers['authorization']):
-        user = Users.objects.get(id_user=id_user)
-        request.data['status'] = False
-        serializer = UsersSerializer(instance=user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Usuario eliminado correctamente'
-            if delete_cookie(id_user):
-                return Response(serializer_dict, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    user = Users.objects.get(id_user=id_user)
+    request.data['status'] = False
+    serializer = UsersSerializer(instance=user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Usuario eliminado correctamente'
+        if delete_cookie(id_user):
+            return Response(serializer_dict, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['PATCH'])
@@ -259,14 +240,12 @@ def user_activate(request):
         return Response({'message': 'No se encontro la cuenta'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+@is_authenticated
 def user_logout(request, id_user=None):
-    if is_user_logged_in(request.headers['authorization']):
-        if delete_cookie(id_user):
-            return Response({'Message': 'Logout Exitoso'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'Message': 'Cookie no encontrada'}, status=status.HTTP_400_BAD_REQUEST)
+    if delete_cookie(id_user):
+        return Response({'Message': 'Logout Exitoso'}, status=status.HTTP_200_OK)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Message': 'Cookie no encontrada'}, status=status.HTTP_400_BAD_REQUEST)
 
 # ============================================================================== #
 # ============================================================================== #
@@ -275,68 +254,62 @@ def user_logout(request, id_user=None):
 
 
 @api_view(['POST'])
+@is_authenticated
 def papersuser_create(request):
-    if is_user_logged_in(request.headers['authorization']):
-        serializer = PapersUserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Papers_User creado correctamente'
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = PapersUserSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Papers_User creado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['GET'])
+@is_authenticated
 def papersuser_list(request):
-    if is_user_logged_in(request.headers['authorization']):
-        try:
-            history = PapersUser.objects.all()
-            serializer = PapersUserSerializer(history, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        history = PapersUser.objects.all()
+        serializer = PapersUserSerializer(history, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['GET'])
+@is_authenticated
 def papersuser_detail(request, id_user=None, id_paper=None):
-    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
-        try:
-            history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
-            serializer = PapersUserSerializer(history, many=False)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
-        except IndexError:
-            return Response('La calificacion no existe', status=status.HTTP_204_NO_CONTENT)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
+        serializer = PapersUserSerializer(history, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
+    except IndexError:
+        return Response('La calificacion no existe', status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['PATCH'])
+@is_authenticated
 def papersuser_update(request, id_user=None, id_paper=None):
-    if is_user_logged_in(request.headers['authorization']):
-        try:
-            history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
-            serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                serializer_dict = serializer.data
-                serializer_dict['message'] = 'Historial modificado correctamente'
-                return Response(serializer_dict, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except ObjectDoesNotExist:
+    try:
+        history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
+        serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            serializer_dict = serializer.data
+            serializer_dict['message'] = 'Historial modificado correctamente'
+            return Response(serializer_dict, status=status.HTTP_201_CREATED)
+        else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except IndexError:
-            return Response("No encontrado", status=status.HTTP_204_NO_CONTENT)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    except ObjectDoesNotExist:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except IndexError:
+        return Response("No encontrado", status=status.HTTP_204_NO_CONTENT)
+
 
 
 # ============================================================================== #
@@ -382,7 +355,7 @@ def paper_multiple_create(request):
 
 @api_view(['POST'])
 def paper_create(request):
-    if is_admin_logged_in(request.headers['authorization']):
+    # if is_admin_logged_in(request.headers['authorization']):
         serializer = PapersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -391,104 +364,97 @@ def paper_create(request):
             return Response(serializer_dict, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    # else:
+    #     return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
+@is_authenticated
 def paper_list(request):
-    if is_user_logged_in(request.headers['authorization']):
-        try:
-            papers = Papers.objects.all()
-            serializer = PapersSerializer(papers, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        papers = Papers.objects.all()
+        serializer = PapersSerializer(papers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['GET'])
+@is_authenticated
 def paper_latest(request):
-    if is_user_logged_in(request.headers['authorization']):
-        try:
-            papers = Papers.objects.order_by('-publication_year')
-            serializer = PapersSerializer(papers, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        papers = Papers.objects.order_by('-publication_year')
+        serializer = PapersSerializer(papers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['GET'])
+@is_authenticated
 def paper_random(request):
-    if is_user_logged_in(request.headers['authorization']):
-        try:
-            papers = Papers.objects.all()
-            random_item = choice(papers)
-            serialized_paper = PapersSerializer(instance=random_item, many=False)
-            return Response(serialized_paper.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        papers = Papers.objects.all()
+        random_item = choice(papers)
+        serialized_paper = PapersSerializer(instance=random_item, many=False)
+        return Response(serialized_paper.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['GET'])
+@is_authenticated
 def paper_detail(request, id_paper=None):
-    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
-        try:
-            paper = Papers.objects.get(id_paper=id_paper)
-            serializer = PapersSerializer(instance=paper, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        paper = Papers.objects.get(id_paper=id_paper)
+        serializer = PapersSerializer(instance=paper, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['POST'])
+@is_authenticated
 def paper_search(request):
-    if is_user_logged_in(request.headers['authorization']):
-        try:
-            papers = Papers.objects.filter(title__icontains=request.data['search'])
-            papers |= Papers.objects.filter(author__icontains=request.data['search'])
-            serializer = PapersSerializer(instance=papers, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response("Papers no encontrados", status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        papers = Papers.objects.filter(title__icontains=request.data['search'])
+        papers |= Papers.objects.filter(author__icontains=request.data['search'])
+        serializer = PapersSerializer(instance=papers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response("Papers no encontrados", status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['PUT'])
+@is_authenticated
 def paper_update(request, id_paper=None):
-    if is_admin_logged_in(request.headers['authorization']):
-        paper = Papers.objects.get(id_paper=id_paper)
-        serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Paper modificado correctamente'
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    paper = Papers.objects.get(id_paper=id_paper)
+    serializer = PapersSerializer(instance=paper, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Paper modificado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['DELETE'])
+@is_authenticated
 def paper_delete(request, id_paper=None):
-    if is_admin_logged_in(request.headers['authorization']):
-        try:
-            paper = Papers.objects.get(id_paper=id_paper)
-            paper.delete()
-            return Response('Paper eliminado correctamente', status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        paper = Papers.objects.get(id_paper=id_paper)
+        paper.delete()
+        return Response('Paper eliminado correctamente', status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+
 
 
 # @api_view(['GET'])
@@ -549,7 +515,7 @@ def category_multiple_create(request):
 
 @api_view(['POST'])
 def category_create(request):
-    if is_admin_logged_in(request.headers['authorization']):
+    # if is_admin_logged_in(request.headers['authorization']):
         serializer = CategoriesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -558,82 +524,77 @@ def category_create(request):
             return Response(serializer_dict, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    # else:
+    #     return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
+@is_authenticated
 def category_list(request):
-    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
-        try:
-            category = Categories.objects.filter(status=True)
-            serializer = CategoriesSerializer(category, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        category = Categories.objects.filter(status=True)
+        serializer = CategoriesSerializer(category, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['GET'])
+@is_authenticated
 def category_detail(request, id_category=None):
-    if is_user_logged_in(request.headers['authorization']) or is_admin_logged_in(request.headers['authorization']):
-        try:
-            category = Categories.objects.get(id_category=id_category, status=True)
-            serializer = CategoriesSerializer(category, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
-    else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        category = Categories.objects.get(id_category=id_category, status=True)
+        serializer = CategoriesSerializer(category, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['PATCH'])
+@is_authenticated
 def category_update(request, id_category=None):
-    if is_admin_logged_in(request.headers['authorization']):
-        category = Categories.objects.get(id_category=id_category)
-        serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Categoria modificada correctamente'
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    category = Categories.objects.get(id_category=id_category)
+    serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Categoria modificada correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['PATCH'])
+@is_authenticated
 def category_delete(request, id_category=None):
-    if is_admin_logged_in(request.headers['authorization']):
-        category = Categories.objects.get(id_category=id_category)
-        request.data['status'] = False
-        serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Categoria eliminada correctamente'
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    category = Categories.objects.get(id_category=id_category)
+    request.data['status'] = False
+    serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Categoria eliminada correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['PATCH'])
+@is_authenticated
 def category_activate(request, id_category=None):
-    if is_admin_logged_in(request.headers['authorization']):
-        category = Categories.objects.get(id_category=id_category)
-        request.data['status'] = True
-        serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Categoria activada correctamente'
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    category = Categories.objects.get(id_category=id_category)
+    request.data['status'] = True
+    serializer = CategoriesSerializer(instance=category, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Categoria activada correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
     else:
-        return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
