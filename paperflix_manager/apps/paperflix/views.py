@@ -75,6 +75,19 @@ def is_admin_logged_in(cookie):
     else:
         return False
 
+def isAuthenticated(func):
+    def function_call(*args, **kwargs):
+        request = args[0]
+        auth = request.headers.get('authorization')
+        if auth:
+            if is_user_logged_in(auth) or is_admin_logged_in(auth):
+                return func(*args, **kwargs)
+            else:
+                return Response({'Message': 'Acceso Denegado'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'Message': 'Error en los Headers: \'authorization\' es necesario.'}, status=status.HTTP_401_UNAUTHORIZED)
+    return function_call
+
 def delete_cookie(id_user=None):
     try:
         cookie = Cookies.objects.get(id_user=id_user)
