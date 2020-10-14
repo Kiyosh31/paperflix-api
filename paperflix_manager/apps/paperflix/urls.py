@@ -5,8 +5,10 @@ from .views import *
 urlpatterns = [
     path('admin-create/', admin_create, name='admin-user-create'),
     path('admin-login/', admin_login, name='admin-user-login'),
+    path('admin-logout/<int:id_user>/', admin_logout, name='admin-user-logout'),
+    path('admin-list/', admin_list, name='admin-user-list'),
 
-    # path('user-list/', user_list, name='user-list'),
+    path('user-list/', user_list, name='user-list'),
     path('user-detail/<int:id_user>/', user_detail, name='user-detail'),
     path('user-login/', user_login, name='user-login'),
     path('user-create/', user_create, name='user-create'),
@@ -14,12 +16,14 @@ urlpatterns = [
     path('user-delete/<int:id_user>/', user_delete, name='user-delete'),
     path('user-activate/', user_activate, name='user-activate'),
     path('user-logout/<int:id_user>/', user_logout, name='user-logout'),
+    path('user-cookies/', user_cookies, name='user-cookies'),
 
     path('papersuser-create/', papersuser_create, name='papersuser-create'),
     path('papersuser-list/', papersuser_list, name='papersuser-list'),
     path('papersuser-detail/<int:id_user>/<int:id_paper>/', papersuser_detail, name='papersuser-detail'),
     path('papersuser-update/<int:id_user>/<int:id_paper>/', papersuser_update, name='papersuser-update'),
-
+    path('papersuser-delete/<int:id_papersuser>/', papersuser_delete, name='papersuser-delete'),
+    
     path('paper-multiple-create/', paper_multiple_create, name='papers-multiple-create'),
     path('paper-create/', paper_create, name='papers-create'),
     path('paper-list/', paper_list, name='papers-list'),
