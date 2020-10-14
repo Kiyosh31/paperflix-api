@@ -105,7 +105,7 @@ def admin_list(request):
 @api_view(['GET'])
 @is_authenticated('Admin', admin_endpoint=True)
 def admin_logout(request, id_user=None):
-    if delete_cookie(id_user, 'admin'):
+    if delete_cookie(id_user=id_user, type_user='admin'):
         return Response({'Message': 'Logout Exitoso'}, status=status.HTTP_200_OK)
     else:
         return Response({'Message': 'Cookie no encontrada'}, status=status.HTTP_400_BAD_REQUEST)
@@ -213,7 +213,7 @@ def user_delete(request, id_user=None):
         serializer.save()
         serializer_dict = serializer.data
         serializer_dict['message'] = 'Usuario eliminado correctamente'
-        if delete_cookie(id_user):
+        if delete_cookie(id_user, type_user='user'):
             return Response(serializer_dict, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -243,7 +243,7 @@ def user_activate(request):
 @api_view(['GET'])
 @is_authenticated('User')
 def user_logout(request, id_user=None):
-    if delete_cookie(id_user, 'user'):
+    if delete_cookie(id_user=id_user, type_user='user'):
         return Response({'Message': 'Logout Exitoso'}, status=status.HTTP_200_OK)
     else:
         return Response({'Message': 'Cookie no encontrada'}, status=status.HTTP_400_BAD_REQUEST)
