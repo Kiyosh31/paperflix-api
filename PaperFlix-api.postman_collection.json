@@ -51,6 +51,12 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Cookie",
+								"value": "pbkdf2_sha256$180000$TWk4e8GATDFX$xBjWd71fJuQhg+S1M7duv/I9+1+vj6tUhSAY8jVDsMw=",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"url": {
@@ -106,12 +112,21 @@
 				{
 					"name": "LOGIN",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
@@ -181,6 +196,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$LOlQ0fmSHgMS$Bsiq06g2HaoxqNrBVTAmddm7i9v2gkAAZRCAmgyu+8Q=",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -188,7 +208,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/user-delete/6/",
+							"raw": "http://127.0.0.1:8000/api/user-delete/1/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -200,7 +220,7 @@
 							"path": [
 								"api",
 								"user-delete",
-								"6",
+								"1",
 								""
 							]
 						}
@@ -240,6 +260,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "LOGOUT",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$3YvCoWvhlW3P$UAqtABjDy3S81R+ADEUbn997L5xW/rOWWZwwlJFShxc=",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/user-logout/1/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user-logout",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -256,11 +307,16 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "pbkdf2_sha256$180000$35sCPQ4idhj6$ENB5E9XwIim33BvcqOyBnmR8OgRkEDNsYAYMRa6nRTc=",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id_category\": \"21\",\r\n    \"title\": \"prueba 2\",\r\n    \"description\": \"esta es la prueba 2\",\r\n    \"publication_year\": \"2019-01\",\r\n    \"author\": \"yo\",\r\n    \"url\": \"https://www.youtube.com\"\r\n}"
+							"raw": "{\r\n    \"id_category\": \"1\",\r\n    \"title\": \"prueba 2\",\r\n    \"description\": \"esta es la prueba 2\",\r\n    \"publication_year\": \"2019-01\",\r\n    \"author\": \"yo\",\r\n    \"url\": \"https://www.youtube.com\"\r\n}"
 						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/paper-create/",
@@ -287,13 +343,13 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json",
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$7G7k6GI9Z6yC$17j78FVUhVGRiXu/99epHmOJfV5FDoSdvulJ/FyuFdM=",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/paper-detail/2101/",
+							"raw": "http://127.0.0.1:8000/api/paper-detail/1/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -305,7 +361,7 @@
 							"path": [
 								"api",
 								"paper-detail",
-								"2101",
+								"1",
 								""
 							]
 						}
@@ -318,8 +374,8 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json",
+								"key": "Authorization",
+								"value": "pbkdf2_sha256$180000$LKYtv9W9CkGF$CGUxmYMqEhY8jxt6938HpOnhkKl7DupasYivkwEZ2Us=",
 								"type": "text"
 							}
 						],
@@ -337,6 +393,13 @@
 								"api",
 								"paper-list",
 								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -351,11 +414,16 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$7G7k6GI9Z6yC$17j78FVUhVGRiXu/99epHmOJfV5FDoSdvulJ/FyuFdM=",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"search\": \"prueba 2\"\r\n}"
+							"raw": "{\r\n    \"search\": \" Localization\"\r\n}"
 						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/paper-search/",
@@ -495,6 +563,62 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "PAGINATION",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/paper-pagination/1/20/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"paper-pagination",
+								"1",
+								"20",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET RANDOM",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$KG48kcaEskGQ$9zmhGLrxAJNRryj2QPDkoIexBiwdKOA/XhwBVwt+YHg=",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/paper-random/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"paper-random",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -539,8 +663,17 @@
 				{
 					"name": "GET ALL",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$KG48kcaEskGQ$9zmhGLrxAJNRryj2QPDkoIexBiwdKOA/XhwBVwt+YHg=",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/category-list/",
 							"protocol": "http",
@@ -564,9 +697,15 @@
 					"name": "GET ONE",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$7G7k6GI9Z6yC$17j78FVUhVGRiXu/99epHmOJfV5FDoSdvulJ/FyuFdM=",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/category-detail/21/",
+							"raw": "http://127.0.0.1:8000/api/category-detail/1/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -578,7 +717,7 @@
 							"path": [
 								"api",
 								"category-detail",
-								"21",
+								"1",
 								""
 							]
 						}
@@ -699,6 +838,45 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "pbkdf2_sha256$180000$l9ctHwvsrD1V$4pg+yeDGKU3PdjbCrYCtYaIoCM/2+U1oedG3Ut0sq9w=",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"search\": \"astro\"\r\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/category-search/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"category-search",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -715,11 +893,16 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$KG48kcaEskGQ$9zmhGLrxAJNRryj2QPDkoIexBiwdKOA/XhwBVwt+YHg=",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id_user\": 1,\r\n    \"id_paper\": 2102,\r\n    \"rating\": 3.5\r\n}"
+							"raw": "{\r\n    \"id_user\": 1,\r\n    \"id_paper\": 2103,\r\n    \"rating\": 3.5\r\n}"
 						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/papersuser-create/",
@@ -744,7 +927,18 @@
 					"name": "GET ALL",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$KG48kcaEskGQ$9zmhGLrxAJNRryj2QPDkoIexBiwdKOA/XhwBVwt+YHg=",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/papersuser-list/",
 							"protocol": "http",
@@ -768,9 +962,15 @@
 					"name": "GET ONE",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$KG48kcaEskGQ$9zmhGLrxAJNRryj2QPDkoIexBiwdKOA/XhwBVwt+YHg=",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/papersuser-detail/1/2102/",
+							"raw": "http://127.0.0.1:8000/api/papersuser-detail/1/1/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -783,7 +983,7 @@
 								"api",
 								"papersuser-detail",
 								"1",
-								"2102",
+								"1",
 								""
 							]
 						}
@@ -799,6 +999,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "authenticated=pbkdf2_sha256$180000$KG48kcaEskGQ$9zmhGLrxAJNRryj2QPDkoIexBiwdKOA/XhwBVwt+YHg=",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -806,7 +1011,7 @@
 							"raw": "{\r\n    \"rating\": 5\r\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/papersuser-update/1/2102/",
+							"raw": "http://127.0.0.1:8000/api/papersuser-update/1/2103/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -819,7 +1024,7 @@
 								"api",
 								"papersuser-update",
 								"1",
-								"2102",
+								"2103",
 								""
 							]
 						}

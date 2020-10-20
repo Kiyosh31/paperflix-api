@@ -38,6 +38,7 @@ urlpatterns = [
     path('category-multiple-create/', category_multiple_create, name='categories-multiple-create'),
     path('category-create/', category_create, name='category-create'),
     path('category-list/', category_list, name='category-list'),
+    path('category-search/', category_search, name='category-search'),
     path('category-detail/<int:id_category>/', category_detail, name='category-detail'),
     path('category-update/<int:id_category>/', category_update, name='category-update'),
     path('category-delete/<int:id_category>/', category_delete, name='category-delete'),

@@ -537,6 +537,17 @@ def category_list(request):
         return Response('Categoria no encontrada', status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['POST'])
+@is_authenticated(['Admin'])
+def category_search(request):
+    try:
+        categories = Categories.objects.filter(category__icontains=request.data['search'])
+        serializer = CategoriesSerializer(instance=categories, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response("Categorias no encontradas", status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['GET'])
 @is_authenticated(['User','Admin'])
 def category_detail(request, id_category=None):
