@@ -3,10 +3,11 @@ from .views import *
 
 
 urlpatterns = [
-    path('admin-create/', admin_create, name='admin-user-create'),
-    path('admin-login/', admin_login, name='admin-user-login'),
-    path('admin-logout/<int:id_user>/', admin_logout, name='admin-user-logout'),
-    path('admin-list/', admin_list, name='admin-user-list'),
+    path('admin-create/', admin_create, name='admin-create'),
+    path('admin-login/', admin_login, name='admin-login'),
+    path('admin-logout/<int:id_user>/', admin_logout, name='admin-logout'),
+    path('admin-list/', admin_list, name='admin-list'),
+    path('admin-update/<int:id_user>/', admin_update, name='admin-update'),
 
     path('user-list/', user_list, name='user-list'),
     path('user-detail/<int:id_user>/', user_detail, name='user-detail'),

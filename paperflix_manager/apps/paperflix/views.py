@@ -102,6 +102,23 @@ def admin_list(request):
         return Response({'message': 'Sin elementos.'}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['PATCH'])
+@is_authenticated('Admin')
+def admin_update(request, id_user=None):
+    if 'password' in request.data:
+        request.data['password'] = make_password(request.data['password'])
+
+    admin = AdminUsers.objects.get(id_user=id_user)
+    serializer = AdminUsersSerializer(instance=admin, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Administrador modificado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 @is_authenticated('Admin', admin_endpoint=True)
 def admin_logout(request, id_user=None):
