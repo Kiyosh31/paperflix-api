@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import *
 
 
@@ -34,7 +34,8 @@ urlpatterns = [
     path('paper-search/', paper_search, name='papers-search'),
     path('paper-update/<int:id_paper>/', paper_update, name='papers-update'),
     path('paper-delete/<int:id_paper>/', paper_delete, name='papers-delete'),
-    # path('paper-pagination/<int:id_category>/<int:last_paper>/', paper_pagination, name='papers-pagination'),
+    path('paper-pagination/<int:id_category>/<int:page_num>/', paper_pagination, name='papers-pagination'),
+    path('paper-pagination-admin/<int:page_num>/', paper_pagination_admin, name='papers-pagination-admin'),
 
     path('category-multiple-create/', category_multiple_create, name='categories-multiple-create'),
     path('category-create/', category_create, name='category-create'),
