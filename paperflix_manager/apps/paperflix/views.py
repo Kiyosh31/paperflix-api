@@ -496,7 +496,7 @@ def paper_pagination(request, id_category=None, page_num=None):
 def paper_pagination_admin(request, page_num=None):
     try:
         page_num = 1 if page_num == 0 else page_num
-        page_size = 20
+        page_size = 50
         start = (page_num-1) * page_size
         end = start + page_size
         papers = Papers.objects.all()[start:end]
