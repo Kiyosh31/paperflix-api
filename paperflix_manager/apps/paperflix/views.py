@@ -274,7 +274,7 @@ def user_logout(request, id_user=None):
 @api_view(['POST'])
 @is_authenticated('User')
 def papersuser_create(request):
-    if PapersUser.objects.get(id_user=request.data.get('id_user'), id_paper=request.data.get('id_paper')):
+    if PapersUser.objects.filter(id_user=request.data.get('id_user'), id_paper=request.data.get('id_paper')):
         return Response({'Message':'Ya se ha calificado este paper.'}, status=status.HTTP_400_BAD_REQUEST)
     serializer = PapersUserSerializer(data=request.data)
     if serializer.is_valid():
