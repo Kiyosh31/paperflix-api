@@ -166,28 +166,37 @@ def user_detail(request, id_user=None):
 
 @api_view(['POST'])
 def user_login(request):
+    user = None
+
+    # Busca si el usuario existe
     try:
-        user = Users.objects.filter(email=request.data['email'], status=True)[0]
-        if check_password(request.data['password'], user.password):
-            try:
-                cookie = Cookies.objects.get(id_user=user.id_user, type_user='user')
-                serialized_cookie = CookiesSerializer(instance=cookie, many=False)
-                return Response(serialized_cookie.data, status=status.HTTP_200_OK)
-            except ObjectDoesNotExist:
-                hashed_cookie = make_password(user.email + request.data['password'])
-                data = {'id_user': user.id_user, 'type_user':'user', 'cookie': hashed_cookie}
-                serialized_new_cookie = CookiesSerializer(data=data)
-                if serialized_new_cookie.is_valid():
-                    serialized_new_cookie.save()
-                    return Response(serialized_new_cookie.data, status=status.HTTP_201_CREATED)
-                else:
-                    return Response({'message': 'Error.'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': 'Contraseña incorecta'}, status=status.HTTP_400_BAD_REQUEST)
+        user = Users.objects.get(email=request.data['email'])
     except ObjectDoesNotExist:
-        return Response({'message': 'El usuario no existe'}, status=status.HTTP_404_NOT_FOUND)
-    except IndexError:
-        return Response({'message': 'IndexError'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Message': 'El usuario no existe'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Valida si el usuario esta activo
+    if not user.status:
+        return Response({'Message': 'El usuario esta inactivo'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Valida si la contraseña es correcta
+    if check_password(request.data['password'], user.password):
+        try:
+            # Revisa si la cookie ya existe en la DB
+            cookie = Cookies.objects.get(id_user=user.id_user, type_user='user')
+            serialized_cookie = CookiesSerializer(instance=cookie, many=False)
+            return Response(serialized_cookie.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            # Si no encuentra la cookie la crea
+            hashed_cookie = make_password(user.email + request.data['password'])
+            data = {'id_user': user.id_user, 'type_user':'user', 'cookie': hashed_cookie}
+            serialized_new_cookie = CookiesSerializer(data=data)
+            if serialized_new_cookie.is_valid():
+                serialized_new_cookie.save()
+                return Response(serialized_new_cookie.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response({'Message': 'Error la cookie no se pudo crear.'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'Message': 'La contraseña es incorrecta'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -240,21 +249,25 @@ def user_delete(request, id_user=None):
 
 @api_view(['PATCH'])
 def user_activate(request):
+    user = None
+    # Validamos que el usuario exista
     try:
-        user = Users.objects.filter(email=request.data['email'])[0]
-        if check_password(request.data['password'], user.password):
-            request.data['status'] = True
-            request.data['password'] = make_password(request.data['password'])
-            serializer = UsersSerializer(instance=user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                serializer_dict = serializer.data
-                serializer_dict['message'] = 'Usuario activado correctamente'
-                return Response(serializer_dict, status=status.HTTP_200_OK)
+        user = Users.objects.get(email=request.data['email'])
     except ObjectDoesNotExist:
-        return Response({'message': 'El objeto no existe'}, status=status.HTTP_404_NOT_FOUND)
-    except IndexError:
-        return Response({'message': 'No se encontro la cuenta'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Message': 'La cuenta no existe'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Validamos que la contraseña sea igual
+    if check_password(request.data['password'], user.password):
+        request.data['status'] = True
+        request.data['password'] = make_password(request.data['password'])
+        serializer = UsersSerializer(instance=user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            serializer_dict = serializer.data
+            serializer_dict['message'] = 'Usuario activado correctamente'
+            return Response(serializer_dict, status=status.HTTP_200_OK)
+    else:
+        return Response({'Message': 'La contraseña es incorrecta'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -406,7 +419,7 @@ def paper_list(request):
         serializer = PapersSerializer(papers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
-        return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)
+        return Response({'Message': 'No hay articulos registrados.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
