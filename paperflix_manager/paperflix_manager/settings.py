@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 SECRET_KEY = 'pt*9^nbf22sa833seq^-_$fy90#ka$3(p#=nh6h_uotssk#eex'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -133,7 +133,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
+    'https://paperflix-webapp.wm.r.appspot.com/',
 ]
 
 CORS_ALLOW_HEADERS = [

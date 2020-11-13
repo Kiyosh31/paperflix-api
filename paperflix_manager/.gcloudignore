@@ -19,4 +19,4 @@ __pycache__/
 /setup.cfg
 
 #Avoid virtualenv
-/env
+/venv
