@@ -654,3 +654,25 @@ def category_activate(request, id_category=None):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+# =================================================================================
+# =================================================================================
+# =================================================================================
+
+
+@api_view(['GET'])
+@is_authenticated('Admin')
+def get_info(request):
+    
+    qty_papers = Papers.objects.count()
+    qty_categories = Categories.objects.filter(status=True).count()
+    ratings = PapersUser.objects.all().values_list('id_paper', flat=True)
+    qty_ratings = len(set(ratings))
+    
+    info = {
+        'papers': qty_papers,
+        'categories': qty_categories,
+        'rateds': qty_ratings
+    }
+
+    return Response(info, status=status.HTTP_200_OK)

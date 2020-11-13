@@ -8,7 +8,9 @@ urlpatterns = [
     path('admin-logout/<int:id_user>/', admin_logout, name='admin-logout'),
     path('admin-list/', admin_list, name='admin-list'),
     path('admin-update/<int:id_user>/', admin_update, name='admin-update'),
-
+    
+    path('get-info/', get_info, name='get-info'),
+    
     path('user-list/', user_list, name='user-list'),
     path('user-detail/<int:id_user>/', user_detail, name='user-detail'),
     path('user-login/', user_login, name='user-login'),
