@@ -316,7 +316,7 @@ def papersuser_list(request, id_user=None):
 
 
 @api_view(['GET'])
-@is_authenticated(['User','Admin'])
+@is_authenticated(['User', 'Admin'])
 def papersuser_detail(request, id_user=None, id_paper=None):
     try:
         history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
