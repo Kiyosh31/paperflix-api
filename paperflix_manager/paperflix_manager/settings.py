@@ -134,6 +134,7 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 CORS_ORIGIN_WHITELIST = [
     'https://paperflix-webapp.wm.r.appspot.com/',
+    'https://admin-paperflix.herokuapp.com/',
 ]
 
 CORS_ALLOW_HEADERS = [
