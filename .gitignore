@@ -8,6 +8,7 @@ media/
 *.sqlite3
 # Backup files #
 *.bak
+static/
 
 # If you are using PyCharm #
 .idea/
