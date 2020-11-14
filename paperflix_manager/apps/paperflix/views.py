@@ -319,32 +319,32 @@ def papersuser_list(request, id_user=None):
 @is_authenticated(['User', 'Admin'])
 def papersuser_detail(request, id_user=None, id_paper=None):
     try:
-        history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
+        # Si existe la calificacion
+        history = PapersUser.objects.get(id_user=id_user, id_paper=id_paper)
         serializer = PapersUserSerializer(history, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
-        return Response('Historial no encontrado', status=status.HTTP_404_NOT_FOUND)
-    except IndexError:
-        return Response('La calificacion no existe', status=status.HTTP_204_NO_CONTENT)
+        # No existe la calificacion
+        return Response('No has calificado', status=status.HTTP_202_ACCEPTED)
 
 
 @api_view(['PATCH'])
 @is_authenticated(['User','Admin'])
 def papersuser_update(request, id_user=None, id_paper=None):
+    history = None
     try:
-        history = PapersUser.objects.filter(id_user=id_user, id_paper=id_paper)[0]
-        serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            serializer_dict = serializer.data
-            serializer_dict['message'] = 'Historial modificado correctamente'
-            return Response(serializer_dict, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        history = PapersUser.objects.get(id_user=id_user, id_paper=id_paper)
     except ObjectDoesNotExist:
+        return Response('La calificacion no existe', status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = PapersUserSerializer(instance=history, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        serializer_dict = serializer.data
+        serializer_dict['message'] = 'Historial modificado correctamente'
+        return Response(serializer_dict, status=status.HTTP_201_CREATED)
+    else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except IndexError:
-        return Response("No encontrado", status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['DELETE'])
