@@ -170,7 +170,7 @@ def user_login(request):
 
     # Busca si el usuario existe
     try:
-        user = Users.objects.get(email=request.data['email'])
+        user = Users.objects.get(email=request.data['email'].lower())
     except ObjectDoesNotExist:
         return Response({'Message': 'El usuario no existe'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -202,6 +202,7 @@ def user_login(request):
 @api_view(['POST'])
 def user_create(request):
     request.data['password'] = make_password(request.data['password'])
+    request.data['email'] = request.data['email'].lower()
     serializer = UsersSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -215,6 +216,9 @@ def user_create(request):
 @api_view(['PATCH'])
 @is_authenticated('User')
 def user_update(request, id_user=None):
+    if 'email' in request.data:
+        request.data['email'] = request.data['email'].lower()
+
     if 'password' in request.data:
         request.data['password'] = make_password(request.data['password'])
 
