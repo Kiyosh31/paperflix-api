@@ -109,7 +109,6 @@ def api_cache(func):
     def cache(*args, **kwargs):
         global cache_papers
         if not cache_papers:
-            print(1)
             resp = func(*args, **kwargs)
             cache_papers = copy.deepcopy(resp)
         return cache_papers
