@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.paperflix',
     'rest_framework',
     'corsheaders',
+    'cachalot',
 ]
 
 MIDDLEWARE = [
