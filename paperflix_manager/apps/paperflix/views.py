@@ -419,8 +419,9 @@ def paper_create(request):
 @is_authenticated(['User','Admin'])
 def paper_list(request):
     try:
-        papers = Papers.objects.all()
-        serializer = PapersSerializer(papers, many=True)
+        # papers = Papers.objects.all()
+        # serializer = PapersSerializer(papers, many=True)
+        serializer = get_all_papers()
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response({'Message': 'No hay articulos registrados.'}, status=status.HTTP_404_NOT_FOUND)

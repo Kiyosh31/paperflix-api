@@ -1,8 +1,10 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Cookies
+from .models import Cookies, Papers
+from .serializers import PapersSerializer
 import json
+import copy
 
 #=========================================
 #============== Constants ================
@@ -100,3 +102,23 @@ def is_authenticated(type_user=['user','admin'], add_id=False, admin_endpoint=Fa
 #=========================================
 #=========================================
 #=========================================
+
+cache_papers = []
+
+def api_cache(func):
+    def cache(*args, **kwargs):
+        global cache_papers
+        if not cache_papers:
+            print(1)
+            resp = func(*args, **kwargs)
+            cache_papers = copy.deepcopy(resp)
+        return cache_papers
+    return cache
+
+
+@api_cache
+def get_all_papers():
+    papers = Papers.objects.all()
+    serializer = PapersSerializer(papers, many=True)
+    return serializer
+
