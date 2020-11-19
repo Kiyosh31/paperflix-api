@@ -419,8 +419,6 @@ def paper_create(request):
 @is_authenticated(['User','Admin'])
 def paper_list(request):
     try:
-        # papers = Papers.objects.all()
-        # serializer = PapersSerializer(papers, many=True)
         serializer = get_all_papers()
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
@@ -431,8 +429,7 @@ def paper_list(request):
 @is_authenticated(['User','Admin'])
 def paper_latest(request):
     try:
-        papers = Papers.objects.order_by('-publication_year')
-        serializer = PapersSerializer(papers, many=True)
+        serializer = get_latest_papers()
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response('Paper no encontrado', status=status.HTTP_404_NOT_FOUND)

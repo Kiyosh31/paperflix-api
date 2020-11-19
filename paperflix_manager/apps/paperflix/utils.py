@@ -104,6 +104,8 @@ def is_authenticated(type_user=['user','admin'], add_id=False, admin_endpoint=Fa
 #=========================================
 
 cache_papers = []
+cache_latest = []
+
 
 def api_cache(func):
     def cache(*args, **kwargs):
@@ -115,9 +117,25 @@ def api_cache(func):
     return cache
 
 
+def api_cache_latest(func):
+    def cache(*args, **kwargs):
+        global cache_latest
+        if not cache_latest:
+            resp = func(*args, **kwargs)
+            cache_latest = copy.deepcopy(resp)
+        return cache_latest
+    return cache
+
+
 @api_cache
 def get_all_papers():
     papers = Papers.objects.all()
     serializer = PapersSerializer(papers, many=True)
     return serializer
 
+
+@api_cache_latest
+def get_latest_papers():
+    latest_papers = Papers.objects.order_by('-publication_year')
+    serializer = PapersSerializer(latest_papers, many=True)
+    return serializer
